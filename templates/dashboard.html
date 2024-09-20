@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Dashboard</title>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <h1>Smart Home IoT Dashboard</h1>
+    <label for="switch">Toggle LED</label>
+    <input type="checkbox" id="switch" onchange="toggleLED()">
+    <p id="ledStatus">LED is OFF</p>
+</body>
+</html>
