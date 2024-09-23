@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 
 app = Flask(__name__)
 
-LED_PIN = 4
+LED_PIN = 18
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_PIN, GPIO.OUT)
 

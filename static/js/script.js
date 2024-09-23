@@ -9,21 +9,18 @@ function toggleLED() {
         },
         body: JSON.stringify({ state: ledState }),
     });
-
     document.getElementById('ledStatus').innerHTML = ledState === 'ON' ? 'LED is ON' : 'LED is OFF';
-
-    //changeImages();
+    changeImages();
 }
 
-// function changeImages(){
-//     if(lightSwitch == "off"){
-//         document.getElementById('lightSwitch').scr='onSwitch.jpg';
-//         document.getElementById('lightbulb').scr='lightOn.png';
-//         lightSwitch = 'on';
-//     }
-//     else{
-//         document.getElementById('lightSwitch').scr='offSwitch.jpg';
-//         document.getElementById('lightbulb').scr='lightOff.png';
-//         lightSwitch = 'off';
-//     }
-// }
+function changeImages(){
+    let ledState = document.getElementById('switch').checked ? 'ON' : 'OFF';
+     if(ledState === "OFF"){
+         document.getElementById('lightSwitch').src='../static/images/offSwitch.jpg';
+         document.getElementById('lightbulb').src='../static/images/lightOff.png';
+     }
+     else{
+         document.getElementById('lightSwitch').src='../static/images/onSwitch.jpg';
+         document.getElementById('lightbulb').src='../static/images/lightOn.png';
+     }
+ }
