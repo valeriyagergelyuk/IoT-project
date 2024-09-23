@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT Dashboard</title>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</head>
-<body>
-    <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()">
-    <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px">
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>IoT Dashboard</title>
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+        <link rel="stylesheet" href="../static/style.css">
+    </head>
+    <body>
+        <div id="container">
+            <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()"> <br>
+            <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px">
+        </div>
+    </body>
 </html>
