@@ -1,10 +1,29 @@
 #container{
     display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: auto;
+    padding: 20px;
+    margin: auto;
     width: 50%;
-    height: 600px;
+    height: 400px;
     padding-top: 100px;
     text-align: center;
+    background-color:black;
+    border-radius: 25px;
+    outline: 3px solid white;
+}
+
+#mainbody{
+    background-color: cadetblue;
+}
+
+#titletext{
+    color: aliceblue;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#lightSwitch{
+    padding: 40px;
+}
+
+#lightbulb{
+    padding: 40px;
 }

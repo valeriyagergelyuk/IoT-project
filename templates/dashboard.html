@@ -7,9 +7,10 @@
         <script src="{{ url_for('static', filename='js/script.js') }}"></script>
         <link rel="stylesheet" href="../static/style.css">
     </head>
-    <body>
+    <body id="mainbody">
         <div id="container">
-            <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()"> <br>
+            <h1 id="titletext">Toggle the switch</h1>
+            <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()"> 
             <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px">
         </div>
     </body>
