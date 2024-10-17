@@ -27,3 +27,7 @@ function changeImages(ledState){
          document.getElementById('lightbulb').src='../static/images/lightOn.png';
      }
  }
+
+ function turnOnFan(){
+    
+ }
