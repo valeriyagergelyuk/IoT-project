@@ -17,7 +17,7 @@ function toggleLED() {
     });
 }
 
-function changeImages(ledState){
+function changeImages(ledState) {
      if(ledState === "OFF"){
          document.getElementById('lightSwitch').src='../static/images/offSwitch.jpg';
          document.getElementById('lightbulb').src='../static/images/lightOff.png';
@@ -28,6 +28,22 @@ function changeImages(ledState){
      }
  }
 
- function turnOnFan(){
-    
+ function turnOnFan() {
+    let emailResult;
+
+    // Get result from a email somehow
+    if(document.getElementById('lightSwitch').getAttribute('src')=='../static/images/offSwitch.jpg'){
+        emailResult = 'ON';
+    }
+    if(document.getElementById('lightSwitch').getAttribute('src')=='../static/images/onSwitch.jpg'){
+        emailResult = 'OFF';
+    }
+
+    fetch('/toggle_motor', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ state: emailResult }),
+    });
  }
