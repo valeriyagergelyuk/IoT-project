@@ -17,11 +17,13 @@ GPIO.setup(Motor1,GPIO.OUT)
 GPIO.setup(Motor2,GPIO.OUT)
 GPIO.setup(Motor3,GPIO.OUT)
 
+data={'temperature': 20,'humidity': 30}
+
 
 
 @app.route("/") #This is the route you specify (in our case it is likely just / for now)
 def home(): #When the route is called it would run this method
-    return render_template('dashboard.html') #What the method runs
+    return render_template('dashboard.html', data=data) #What the method runs
 
 @app.route('/toggle_led', methods=['POST'])
 def toggle_led():

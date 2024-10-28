@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <script type="text/javascript">
+            const temperature = "{{ data.temperature }}";
+            const humidity = "{{ data.humidity }}";
+         </script>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>IoT Dashboard</title>
@@ -36,20 +40,20 @@
             window.onload = function(){
                 var temp = new JustGage({
                 id: "temp",
-                value: 20,
+                value: temperature,
                 min: 0,
                 max: 100,
                 title: "Temperature",
-                label: "Celcius"
+                label: temperature + " Celcius"
                 });
 
                 var hum = new JustGage({
                 id: "hum",
-                value: 20,
+                value: humidity,
                 min: 0,
                 max: 100,
                 title: "Humidity",
-                label: "%"
+                label: humidity + "%"
                 });
             }
             
