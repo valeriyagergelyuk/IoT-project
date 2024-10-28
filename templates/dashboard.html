@@ -15,26 +15,44 @@
         </div>
 
 
-        <div id="container">
+        <!-- <div id="container">
             <h1 id="titletext">motor test</h1>
             <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="turnOnFan()"> 
             <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px">
-        </div>
+        </div> -->
+        <div id="container">
+        <div id="temp"></div>
+        <div id="hum"></div></div>
 
         <!-- Raphael must be included before justgage -->
         <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.2.9/justgage.min.js"></script> -->
-        <script src='../static/gauge_files/raphael-2.1.4.min.js'></script>        
-        <script src='../static/gauge_files/justgage.js'></script>
+        <!-- <script src='../static/gauge_files/raphael-2.1.4.min.js'></script>        
+        <script src='../static/gauge_files/justgage.js'></script> -->
+        <script src="{{ url_for('static', filename='gauge_files/raphael-2.1.4.min.js') }}"></script>        
+        <script src="{{ url_for('static', filename='gauge_files/justgage.js') }}"></script>
         <script>
-            var g1 = new JustGage({
-            id: "g1",
-            value: 20,
-            min: 0,
-            max: 100,
-            title: "Big Fella",
-            label: "pounds"
-            });
+            var temp, hum;
+            window.onload = function(){
+                var temp = new JustGage({
+                id: "temp",
+                value: 20,
+                min: 0,
+                max: 100,
+                title: "Temperature",
+                label: "Celcius"
+                });
+
+                var hum = new JustGage({
+                id: "hum",
+                value: 20,
+                min: 0,
+                max: 100,
+                title: "Humidity",
+                label: "%"
+                });
+            }
+            
         </script>
     </body>
 </html>
