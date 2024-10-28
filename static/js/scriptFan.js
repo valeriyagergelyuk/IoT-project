@@ -11,8 +11,20 @@ function changeFanImages(emailResult) {
     }
 }
 
+function getEmailResult() {
+    fetch('/get_DHT_11', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }
+        ).then((response) => {
+            return response.json();
+        });
+}
+
 function toggleFan() {
-    let emailResult;
+    let emailResult = getEmailResult();
 
     // Get result from a email somehow
     if(document.getElementById('lightSwitch').getAttribute('src')=='../static/images/offSwitch.jpg'){
