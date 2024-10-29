@@ -1,12 +1,21 @@
 from flask import Flask, render_template, request, jsonify
+from Freenove_DHT import DHT 
 import RPi.GPIO as GPIO
 
 app = Flask(__name__)
 
 #For LED
 LED_PIN = 18
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_PIN, GPIO.OUT)
+
+#for dht11
+DHTPin = 17
+dht = DHT(DHTPin)
+temp = dht.getHumidity()
+hum = dht.getTemperature()
+
 
 #For Motor
 Motor1 = 22 # Enable Pin
@@ -17,7 +26,7 @@ GPIO.setup(Motor1,GPIO.OUT)
 GPIO.setup(Motor2,GPIO.OUT)
 GPIO.setup(Motor3,GPIO.OUT)
 
-data={'temperature': 20,'humidity': 30}
+data={'temperature': temp,'humidity': hum}
 
 
 
