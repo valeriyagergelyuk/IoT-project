@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 app = Flask(__name__)
 
 #For LED
-LED_PIN = 18
+LED_PIN = 19
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_PIN, GPIO.OUT)
@@ -13,8 +13,9 @@ GPIO.setup(LED_PIN, GPIO.OUT)
 #for dht11
 DHTPin = 17
 dht = DHT(DHTPin)
-temp = dht.getHumidity()
-hum = dht.getTemperature()
+dht.readDHT11()
+hum = dht.getHumidity()
+temp = dht.getTemperature()
 
 
 #For Motor
