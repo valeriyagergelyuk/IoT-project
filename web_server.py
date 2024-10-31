@@ -1,39 +1,96 @@
 from flask import Flask, render_template, request, jsonify
 from Freenove_DHT import DHT 
 import RPi.GPIO as GPIO
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import time
+import threading  # Import threading
 
 app = Flask(__name__)
 
-#For LED
+# For LED
 LED_PIN = 19
-
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)  # Disable warnings
 GPIO.setup(LED_PIN, GPIO.OUT)
 
-#for dht11
+# For DHT11
 DHTPin = 17
 dht = DHT(DHTPin)
 dht.readDHT11()
 hum = dht.getHumidity()
 temp = dht.getTemperature()
 
+# For Motor
+Motor1 = 22  # Enable Pin
+Motor2 = 27  # Input Pin 1
+Motor3 = 17  # Input Pin 2
 
-#For Motor
-Motor1 = 22 # Enable Pin
-Motor2 = 27 # Input Pin 1
-Motor3 = 17 # Input Pin 2
+GPIO.setup(Motor1, GPIO.OUT)
+GPIO.setup(Motor2, GPIO.OUT)
+GPIO.setup(Motor3, GPIO.OUT)
 
-GPIO.setup(Motor1,GPIO.OUT)
-GPIO.setup(Motor2,GPIO.OUT)
-GPIO.setup(Motor3,GPIO.OUT)
+data = {'temperature': temp, 'humidity': hum}
 
-data={'temperature': temp,'humidity': hum}
+def send_email():
+    sender_email = "sheldongreen2002@gmail.com"
+    sender_password = "lhdy zjkw rwgt kiji" # in App password
+    recipient_email = "sheldongreen2002@gmail.com"
 
+    subject = "Temperature Alert"
+    body = "The temperature has exceeded 24 degrees Celsius."
 
+    
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
 
-@app.route("/") #This is the route you specify (in our case it is likely just / for now)
-def home(): #When the route is called it would run this method
-    return render_template('dashboard.html', data=data) #What the method runs
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls() 
+            server.login(sender_email, sender_password)  
+            server.send_message(msg)  
+            print("Email sent successfully!")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+def loop():
+    global hum, temp
+    sumCnt = 0
+    okCnt = 0
+    email_sent = False  # Flag to track if the email has been sent
+
+    while True:
+        sumCnt += 1
+        chk = dht.readDHT11()   
+        if chk == 0:
+            okCnt += 1      
+        
+        okRate = 100.0 * okCnt / sumCnt
+        temperature = dht.getTemperature()
+
+        print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
+        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, dht.getHumidity(), temperature))
+
+        # Update humidity and temperature for the web server
+        hum = dht.getHumidity()
+        temp = temperature
+
+        # Check temperature and send email if necessary
+        if temperature > 24 and not email_sent:
+            send_email()  # Send email
+            email_sent = True  # Set flag to indicate email has been sent
+        elif temperature <= 24:
+            email_sent = False  # Reset the flag if temperature goes below 24
+
+        time.sleep(3)
+
+@app.route("/") 
+def home(): 
+    return render_template('dashboard.html', data={'temperature': temp, 'humidity': hum}) 
 
 @app.route('/toggle_led', methods=['POST'])
 def toggle_led():
@@ -48,16 +105,28 @@ def toggle_led():
 def toggle_motor():
     data = request.json
     if data['state'] == 'ON':
-        GPIO.output(Motor1,GPIO.HIGH) # Sets it on
+        GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
         # Handles direction
-        GPIO.output(Motor2,GPIO.LOW)
-        GPIO.output(Motor3,GPIO.HIGH) 
+        GPIO.output(Motor2, GPIO.LOW)
+        GPIO.output(Motor3, GPIO.HIGH) 
     else:
-        GPIO.output(Motor1,GPIO.LOW) # Sets it off
+        GPIO.output(Motor1, GPIO.LOW)  # Sets it off
         # Handles direction
-        GPIO.output(Motor2,GPIO.LOW)
-        GPIO.output(Motor3,GPIO.HIGH)
+        GPIO.output(Motor2, GPIO.LOW)
+        GPIO.output(Motor3, GPIO.HIGH)
     return jsonify(success=True)
 
+@app.route('/respond_fan', methods=['POST'])
+def respond_fan():
+    data = request.json
+    if data['response'] == 'yes':
+        GPIO.output(Motor1, GPIO.HIGH)  # Turn on the fan
+        return jsonify(success=True, message="Fan turned on.")
+    else:
+        return jsonify(success=False, message="No action taken.")
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000) #This part should be at the end at all times as anything under won't be ran
+    # Start the temperature monitoring loop in a separate thread
+    threading.Thread(target=loop, daemon=True).start()
+    
+    app.run(host='0.0.0.0', port=5000) 
