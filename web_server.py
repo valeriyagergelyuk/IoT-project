@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, jsonify
+from datetime import datetime
 from Freenove_DHT import DHT 
 import RPi.GPIO as GPIO
 import smtplib
+import imaplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import time
@@ -52,10 +54,54 @@ def send_email():
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
             server.starttls() 
             server.login(sender_email, sender_password)  
-            server.send_message(msg)  
+            server.send_message(msg) 
+            date_email_sent = dateTime.now()
             print("Email sent successfully!")
+            #capture_email(date_email_sent)
     except Exception as e:
         print(f"Error sending email: {e}")
+
+# def capture_email(date_email_sent):
+    # mail_received = False
+
+    # sender_email = "sheldongreen2002@gmail.com"
+    # sender_password = "lhdy zjkw rwgt kiji"
+    # mail = imaplib.IMAP4_SSL('smtp.gmail.com')
+
+    # #logging in
+    # mail.login(sender_email, sender_password)
+
+    # #looping while the email has not been received
+    # while mail_received == False:
+        
+    #     mail.select('inbox')
+    #     status, data = mail.search(None, 'SUBJECT "Temperature Alert"')
+        
+    #     #list of emails
+    #     mails = data[0],split()
+
+    #     #looping through the emails if there are any
+    #     if mails:
+    #         for email in mails:
+    #             status, info = mail.fetch(i, '(RFC822)')
+
+    #             for response_part in email:
+    #                 if isinstance(response_part, tuple):
+    #                     message = email.message_from_bytes(response_part[1])
+
+    #                     mail_from = message['from']
+    #                     mail_body = message['body']
+    #                     date_str = message["Date"]
+    #                     #date_str = message.get("Date")
+
+    #                     #parsing date string and converting to date time
+    #                     mail_date = dateTime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
+
+    #                     #checking if the email is valied
+    #                     if mail_from == 'name' and mail_body == 'Yes' and mail_date > date_email_sent:
+    #                         mail_received = True
+
+    #                         #activate the motor
 
 def loop():
     global hum, temp
