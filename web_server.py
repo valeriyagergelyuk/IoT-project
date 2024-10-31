@@ -4,10 +4,14 @@ from Freenove_DHT import DHT
 import RPi.GPIO as GPIO
 import smtplib
 import imaplib
+import email
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import time
 import threading  # Import threading
+from pprint import pprint
+from email import policy
+from email.parser import BytesParser
 
 app = Flask(__name__)
 
@@ -36,9 +40,9 @@ GPIO.setup(Motor3, GPIO.OUT)
 data = {'temperature': temp, 'humidity': hum}
 
 def send_email():
-    sender_email = "sheldongreen2002@gmail.com"
-    sender_password = "lhdy zjkw rwgt kiji" # in App password
-    recipient_email = "sheldongreen2002@gmail.com"
+    sender_email = "moars700@gmail.com"
+    sender_password = "ucgu qkwh ltab zapt" # in App password
+    recipient_email = "giannouleaschris@gmail.com"
 
     subject = "Temperature Alert"
     body = "The temperature has exceeded 24 degrees Celsius."
@@ -57,15 +61,18 @@ def send_email():
             server.send_message(msg) 
             date_email_sent = datetime.now()
             print("Email sent successfully!")
+            time.sleep(2)
+
             capture_email(date_email_sent)
     except Exception as e:
         print(f"Error sending email: {e}")
 
 def capture_email(date_email_sent):
     mail_received = False
+    tries = 4
 
-    sender_email = "sheldongreen2002@gmail.com"
-    sender_password = "lhdy zjkw rwgt kiji"
+    sender_email = "moars700@gmail.com"
+    sender_password = "ucgu qkwh ltab zapt"
     mail = imaplib.IMAP4_SSL('smtp.gmail.com')
 
     #logging in
@@ -82,27 +89,48 @@ def capture_email(date_email_sent):
 
         #looping through the emails if there are any
         if mails:
-            for email in mails:
-                status, info = mail.fetch(email, '(RFC822)')
-
-                for response_part in email:
+            for email_id in mails:
+                
+                status, info = mail.fetch(email_id, '(RFC822)')
+                
+                for response_part in info:
                     if isinstance(response_part, tuple):
-                        message = email.message_from_bytes(response_part[1])
-
+                        # Parse the email content
+                        message = BytesParser(policy=policy.default).parsebytes(response_part[1])
+                        
                         mail_from = message['from']
-                        mail_body = message['body']
                         date_str = message["Date"]
-                        #date_str = message.get("Date")
+                        mail_body = None
+                        first_line = None
 
-                        #parsing date string and converting to date time
-                        mail_date = dateTime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
+                        # Extracting the body
+                        if message.is_multipart():
+                            for part in message.iter_parts():
+                                if part.get_content_type() == 'text/plain':
+                                    mail_body = part.get_payload(decode=True).decode().strip()
+                                    first_line = mail_body.splitlines()[0]
+                                    break
+                                    
+                        # Debug information
+                        print(mail_from)
+                        print(first_line)
+                        print(date_str)
 
                         #checking if the email is valied
-                        if mail_from == 'name' and mail_body == 'Yes' and mail_date > date_email_sent:
-                            mail_received = True
-                            print("Got email")
-
+                    if first_line == 'Yes': # and mail_date > date_email_sent:
+                        mail_received = True
+                        print("Fan Turning On")
                             #activate the motor
+                    elif first_line == 'No':
+                        print("Fan Not Turning On")
+
+        #tries = tries - 1
+        #print("Retrying...")                   
+        #time.sleep(5)
+        #if(tries == 0):
+        #    print("Failed to recieve email")
+        #    break
+
 
 def loop():
     global hum, temp
@@ -117,7 +145,7 @@ def loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        temperature = dht.getTemperature()
+        temperature = 24
 
         print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
         print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, dht.getHumidity(), temperature))
@@ -148,29 +176,29 @@ def toggle_led():
         GPIO.output(LED_PIN, GPIO.LOW)
     return jsonify(success=True)
 
-@app.route('/toggle_motor', methods=['POST'])
-def toggle_motor():
-    data = request.json
-    if data['state'] == 'ON':
-        GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
-        # Handles direction
-        GPIO.output(Motor2, GPIO.LOW)
-        GPIO.output(Motor3, GPIO.HIGH) 
-    else:
-        GPIO.output(Motor1, GPIO.LOW)  # Sets it off
-        # Handles direction
-        GPIO.output(Motor2, GPIO.LOW)
-        GPIO.output(Motor3, GPIO.HIGH)
-    return jsonify(success=True)
+# @app.route('/toggle_motor', methods=['POST'])
+# def toggle_motor():
+#     data = request.json
+#     if data['state'] == 'ON':
+#         GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
+#         # Handles direction
+#         GPIO.output(Motor2, GPIO.LOW)
+#         GPIO.output(Motor3, GPIO.HIGH) 
+#     else:
+#         GPIO.output(Motor1, GPIO.LOW)  # Sets it off
+#         # Handles direction
+#         GPIO.output(Motor2, GPIO.LOW)
+#         GPIO.output(Motor3, GPIO.HIGH)
+#     return jsonify(success=True)
 
-@app.route('/respond_fan', methods=['POST'])
-def respond_fan():
-    data = request.json
-    if data['response'] == 'yes':
-        GPIO.output(Motor1, GPIO.HIGH)  # Turn on the fan
-        return jsonify(success=True, message="Fan turned on.")
-    else:
-        return jsonify(success=False, message="No action taken.")
+# @app.route('/respond_fan', methods=['POST'])
+# def respond_fan():
+#     data = request.json
+#     if data['response'] == 'yes':
+#         GPIO.output(Motor1, GPIO.HIGH)  # Turn on the fan
+#         return jsonify(success=True, message="Fan turned on.")
+#     else:
+#         return jsonify(success=False, message="No action taken.")
 
 if __name__ == "__main__":
     # Start the temperature monitoring loop in a separate thread
