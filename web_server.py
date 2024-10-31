@@ -18,7 +18,7 @@ GPIO.setwarnings(False)  # Disable warnings
 GPIO.setup(LED_PIN, GPIO.OUT)
 
 # For DHT11
-DHTPin = 17
+DHTPin = 13
 dht = DHT(DHTPin)
 dht.readDHT11()
 hum = dht.getHumidity()
@@ -55,53 +55,54 @@ def send_email():
             server.starttls() 
             server.login(sender_email, sender_password)  
             server.send_message(msg) 
-            date_email_sent = dateTime.now()
+            date_email_sent = datetime.now()
             print("Email sent successfully!")
-            #capture_email(date_email_sent)
+            capture_email(date_email_sent)
     except Exception as e:
         print(f"Error sending email: {e}")
 
-# def capture_email(date_email_sent):
-    # mail_received = False
+def capture_email(date_email_sent):
+    mail_received = False
 
-    # sender_email = "sheldongreen2002@gmail.com"
-    # sender_password = "lhdy zjkw rwgt kiji"
-    # mail = imaplib.IMAP4_SSL('smtp.gmail.com')
+    sender_email = "sheldongreen2002@gmail.com"
+    sender_password = "lhdy zjkw rwgt kiji"
+    mail = imaplib.IMAP4_SSL('smtp.gmail.com')
 
-    # #logging in
-    # mail.login(sender_email, sender_password)
+    #logging in
+    mail.login(sender_email, sender_password)
 
-    # #looping while the email has not been received
-    # while mail_received == False:
+    #looping while the email has not been received
+    while mail_received == False:
         
-    #     mail.select('inbox')
-    #     status, data = mail.search(None, 'SUBJECT "Temperature Alert"')
+        mail.select('inbox')
+        status, data = mail.search(None, 'SUBJECT "Temperature Alert"')
         
-    #     #list of emails
-    #     mails = data[0],split()
+        #list of emails
+        mails = data[0],split()
 
-    #     #looping through the emails if there are any
-    #     if mails:
-    #         for email in mails:
-    #             status, info = mail.fetch(i, '(RFC822)')
+        #looping through the emails if there are any
+        if mails:
+            for email in mails:
+                status, info = mail.fetch(i, '(RFC822)')
 
-    #             for response_part in email:
-    #                 if isinstance(response_part, tuple):
-    #                     message = email.message_from_bytes(response_part[1])
+                for response_part in email:
+                    if isinstance(response_part, tuple):
+                        message = email.message_from_bytes(response_part[1])
 
-    #                     mail_from = message['from']
-    #                     mail_body = message['body']
-    #                     date_str = message["Date"]
-    #                     #date_str = message.get("Date")
+                        mail_from = message['from']
+                        mail_body = message['body']
+                        date_str = message["Date"]
+                        #date_str = message.get("Date")
 
-    #                     #parsing date string and converting to date time
-    #                     mail_date = dateTime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
+                        #parsing date string and converting to date time
+                        mail_date = dateTime.strptime(date_str, "%Y-%m-%d %H:%M:%S.%f")
 
-    #                     #checking if the email is valied
-    #                     if mail_from == 'name' and mail_body == 'Yes' and mail_date > date_email_sent:
-    #                         mail_received = True
+                        #checking if the email is valied
+                        if mail_from == 'name' and mail_body == 'Yes' and mail_date > date_email_sent:
+                            mail_received = True
+                            print("Got email")
 
-    #                         #activate the motor
+                            #activate the motor
 
 def loop():
     global hum, temp
@@ -126,10 +127,10 @@ def loop():
         temp = temperature
 
         # Check temperature and send email if necessary
-        if temperature > 24 and not email_sent:
+        if temperature > 20 and not email_sent:
             send_email()  # Send email
             email_sent = True  # Set flag to indicate email has been sent
-        elif temperature <= 24:
+        elif temperature <= 20:
             email_sent = False  # Reset the flag if temperature goes below 24
 
         time.sleep(3)
@@ -147,29 +148,29 @@ def toggle_led():
         GPIO.output(LED_PIN, GPIO.LOW)
     return jsonify(success=True)
 
-@app.route('/toggle_motor', methods=['POST'])
-def toggle_motor():
-    data = request.json
-    if data['state'] == 'ON':
-        GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
-        # Handles direction
-        GPIO.output(Motor2, GPIO.LOW)
-        GPIO.output(Motor3, GPIO.HIGH) 
-    else:
-        GPIO.output(Motor1, GPIO.LOW)  # Sets it off
-        # Handles direction
-        GPIO.output(Motor2, GPIO.LOW)
-        GPIO.output(Motor3, GPIO.HIGH)
-    return jsonify(success=True)
+# @app.route('/toggle_motor', methods=['POST'])
+# def toggle_motor():
+#     data = request.json
+#     if data['state'] == 'ON':
+#         GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
+#         # Handles direction
+#         GPIO.output(Motor2, GPIO.LOW)
+#         GPIO.output(Motor3, GPIO.HIGH) 
+#     else:
+#         GPIO.output(Motor1, GPIO.LOW)  # Sets it off
+#         # Handles direction
+#         GPIO.output(Motor2, GPIO.LOW)
+#         GPIO.output(Motor3, GPIO.HIGH)
+#     return jsonify(success=True)
 
-@app.route('/respond_fan', methods=['POST'])
-def respond_fan():
-    data = request.json
-    if data['response'] == 'yes':
-        GPIO.output(Motor1, GPIO.HIGH)  # Turn on the fan
-        return jsonify(success=True, message="Fan turned on.")
-    else:
-        return jsonify(success=False, message="No action taken.")
+# @app.route('/respond_fan', methods=['POST'])
+# def respond_fan():
+#     data = request.json
+#     if data['response'] == 'yes':
+#         GPIO.output(Motor1, GPIO.HIGH)  # Turn on the fan
+#         return jsonify(success=True, message="Fan turned on.")
+#     else:
+#         return jsonify(success=False, message="No action taken.")
 
 if __name__ == "__main__":
     # Start the temperature monitoring loop in a separate thread
