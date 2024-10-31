@@ -78,12 +78,12 @@ def capture_email(date_email_sent):
         status, data = mail.search(None, 'SUBJECT "Temperature Alert"')
         
         #list of emails
-        mails = data[0],split()
+        mails = data[0].split()
 
         #looping through the emails if there are any
         if mails:
             for email in mails:
-                status, info = mail.fetch(i, '(RFC822)')
+                status, info = mail.fetch(email, '(RFC822)')
 
                 for response_part in email:
                     if isinstance(response_part, tuple):
@@ -148,29 +148,29 @@ def toggle_led():
         GPIO.output(LED_PIN, GPIO.LOW)
     return jsonify(success=True)
 
-# @app.route('/toggle_motor', methods=['POST'])
-# def toggle_motor():
-#     data = request.json
-#     if data['state'] == 'ON':
-#         GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
-#         # Handles direction
-#         GPIO.output(Motor2, GPIO.LOW)
-#         GPIO.output(Motor3, GPIO.HIGH) 
-#     else:
-#         GPIO.output(Motor1, GPIO.LOW)  # Sets it off
-#         # Handles direction
-#         GPIO.output(Motor2, GPIO.LOW)
-#         GPIO.output(Motor3, GPIO.HIGH)
-#     return jsonify(success=True)
+@app.route('/toggle_motor', methods=['POST'])
+def toggle_motor():
+    data = request.json
+    if data['state'] == 'ON':
+        GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
+        # Handles direction
+        GPIO.output(Motor2, GPIO.LOW)
+        GPIO.output(Motor3, GPIO.HIGH) 
+    else:
+        GPIO.output(Motor1, GPIO.LOW)  # Sets it off
+        # Handles direction
+        GPIO.output(Motor2, GPIO.LOW)
+        GPIO.output(Motor3, GPIO.HIGH)
+    return jsonify(success=True)
 
-# @app.route('/respond_fan', methods=['POST'])
-# def respond_fan():
-#     data = request.json
-#     if data['response'] == 'yes':
-#         GPIO.output(Motor1, GPIO.HIGH)  # Turn on the fan
-#         return jsonify(success=True, message="Fan turned on.")
-#     else:
-#         return jsonify(success=False, message="No action taken.")
+@app.route('/respond_fan', methods=['POST'])
+def respond_fan():
+    data = request.json
+    if data['response'] == 'yes':
+        GPIO.output(Motor1, GPIO.HIGH)  # Turn on the fan
+        return jsonify(success=True, message="Fan turned on.")
+    else:
+        return jsonify(success=False, message="No action taken.")
 
 if __name__ == "__main__":
     # Start the temperature monitoring loop in a separate thread
