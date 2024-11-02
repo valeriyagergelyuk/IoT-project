@@ -27,6 +27,9 @@ dht = DHT(DHTPin)
 dht.readDHT11()
 hum = dht.getHumidity()
 temp = dht.getTemperature()
+sumCnt = 0
+okCnt = 0
+dht_is_running = True
 
 # For Motor
 Motor1 = 22  # Enable Pin
@@ -67,15 +70,17 @@ def send_email():
             server.send_message(msg) 
             date_email_sent = datetime.now()
             print("Email sent successfully!")
-            time.sleep(2)
+            time.sleep(5)
 
             capture_email(date_email_sent)
     except Exception as e:
         print(f"Error sending email: {e}")
 
 def capture_email(date_email_sent):
-    mail_received = False
+    yes_mail_received = False
     tries = 4
+    global dht_is_running
+    dht_thread = threading.Thread(target=dht_loop, daemon=True)
 
     sender_email = "moars700@gmail.com"
     sender_password = "ucgu qkwh ltab zapt"
@@ -84,8 +89,11 @@ def capture_email(date_email_sent):
     #logging in
     mail.login(sender_email, sender_password)
 
+    dht_thread = threading.Thread(target=dht_loop, daemon=True)
+    dht_thread.start()
+
     #looping while the email has not been received
-    while mail_received == False:
+    while yes_mail_received == False:
         
         mail.select('inbox')
         status, data = mail.search(None, 'SUBJECT "Temperature Alert"')
@@ -95,7 +103,7 @@ def capture_email(date_email_sent):
 
         #looping through the emails if there are any
         if mails:
-            for email_id in mails:
+            for email_id in reversed(mails):
                 
                 status, info = mail.fetch(email_id, '(RFC822)')
                 
@@ -122,15 +130,29 @@ def capture_email(date_email_sent):
                         print(first_line)
                         print(date_str)
 
-                        #checking if the email is valied
-                    if first_line == 'Yes': # and mail_date > date_email_sent:
-                        mail_received = True
+                    if first_line == 'Yes':
+                        yes_mail_received = True
                         print("Fan Turning On")
                         toggle_motor(first_line)
-                        #It should change the image here, but I am not sure how to call a js from python
 
-                    elif first_line == 'No':
+                        # this will get rid of the emai after it has seen it
+                        mail.store(email_id, '+FLAGS', '\\Deleted')
+                        mail.expunge()
+
+                        # It should change the image here, but I am not sure how to call a js from python
+
+                    elif first_line != None:
                         print("Fan Not Turning On")
+                        yes_mail_received = False
+                        # this will get rid of the emai after it has seen it
+                        mail.store(email_id, '+FLAGS', '\\Deleted')
+                        mail.expunge()
+
+                if(yes_mail_received == True):
+                    dht_is_running = False
+                    break
+        
+        ## Now the email will wait for a yes always, but if user says no, it won't resend if it dropps down to below 24, then comes back up uptill the user says yes, should that be changed?
 
         ## not sure if we should have a limiter of some kind incase the user never replies or the email just fails to send
         ## Rn if something happens to the email where it just never gets sent, it will wait infinty for the response (Atleast i think it would)
@@ -142,6 +164,26 @@ def capture_email(date_email_sent):
         #if(tries == 0):
         #    print("Failed to recieve email")
         #    break
+def dht_loop():
+    global hum, temp, sumCnt, okCnt
+
+    while dht_is_running:
+        sumCnt += 1
+        chk = dht.readDHT11()   
+        if chk == 0:
+            okCnt += 1      
+        
+        okRate = 100.0 * okCnt / sumCnt
+        temperature = 24
+
+        print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
+        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, dht.getHumidity(), temperature))
+
+        # Update humidity and temperature for the web server
+        hum = dht.getHumidity()
+        temp = temperature
+        time.sleep(3)
+
 def toggle_motor(emailResult):
     
     if emailResult == 'Yes':
@@ -153,9 +195,7 @@ def toggle_motor(emailResult):
         GPIO.output(Motor1, GPIO.LOW)  # Sets it off
 
 def loop():
-    global hum, temp
-    sumCnt = 0
-    okCnt = 0
+    global hum, temp, sumCnt, okCnt
     email_sent = False  # Flag to track if the email has been sent
     motor_switch = 'off'
 
