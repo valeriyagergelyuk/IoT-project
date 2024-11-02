@@ -23,8 +23,7 @@ function getEmailResult() {
         });
 }
 
-function toggleFan() {
-    let emailResult = getEmailResult();
+function toggleFan(emailResult) {
 
     // Get result from a email somehow
     if(document.getElementById('lightSwitch').getAttribute('src')=='../static/images/offSwitch.jpg'){
@@ -35,11 +34,11 @@ function toggleFan() {
     }
     changeFanImages(emailResult);
 
-    fetch('/toggle_motor', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ state: emailResult }),
-    });
+    // fetch('/toggle_motor', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ state: emailResult }),
+    // });
 }

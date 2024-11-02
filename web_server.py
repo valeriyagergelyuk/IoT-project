@@ -1,15 +1,14 @@
 from flask import Flask, render_template, request, jsonify
-from datetime import datetime
-from Freenove_DHT import DHT 
+import time
+import threading  # Import threading
 import RPi.GPIO as GPIO
 import smtplib
 import imaplib
 import email
+from datetime import datetime
+from Freenove_DHT import DHT 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import time
-import threading  # Import threading
-from pprint import pprint
 from email import policy
 from email.parser import BytesParser
 
@@ -108,10 +107,10 @@ def capture_email(date_email_sent):
                             for part in message.iter_parts():
                                 if part.get_content_type() == 'text/plain':
                                     mail_body = part.get_payload(decode=True).decode().strip()
+                                    # Makng sure to only get one line
                                     first_line = mail_body.splitlines()[0]
                                     break
                                     
-                        # Debug information
                         print(mail_from)
                         print(first_line)
                         print(date_str)
@@ -120,9 +119,15 @@ def capture_email(date_email_sent):
                     if first_line == 'Yes': # and mail_date > date_email_sent:
                         mail_received = True
                         print("Fan Turning On")
-                            #activate the motor
+                        toggle_motor(first_line)
+                        #It should change the image here, but I am not sure how to call a js from python
+
                     elif first_line == 'No':
                         print("Fan Not Turning On")
+
+        ## not sure if we should have a limiter of some kind incase the user never replies or the email just fails to send
+        ## Rn if something happens to the email where it just never gets sent, it will wait infinty for the response (Atleast i think it would)
+        ## Maybe there shuold be something to just resend it after it checks for a response 5 times
 
         #tries = tries - 1
         #print("Retrying...")                   
@@ -130,13 +135,22 @@ def capture_email(date_email_sent):
         #if(tries == 0):
         #    print("Failed to recieve email")
         #    break
-
+def toggle_motor(emailResult):
+    
+    if emailResult == 'Yes':
+        GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
+        # Handles direction
+        GPIO.output(Motor2, GPIO.LOW)
+        GPIO.output(Motor3, GPIO.HIGH) 
+    else:
+        GPIO.output(Motor1, GPIO.LOW)  # Sets it off
 
 def loop():
     global hum, temp
     sumCnt = 0
     okCnt = 0
     email_sent = False  # Flag to track if the email has been sent
+    motor_switch = 'off'
 
     while True:
         sumCnt += 1
@@ -160,6 +174,8 @@ def loop():
             email_sent = True  # Set flag to indicate email has been sent
         elif temperature <= 20:
             email_sent = False  # Reset the flag if temperature goes below 24
+            # This should automatically turn off the motor 
+            toggle_motor(motor_switch)
 
         time.sleep(3)
 
@@ -175,30 +191,6 @@ def toggle_led():
     else:
         GPIO.output(LED_PIN, GPIO.LOW)
     return jsonify(success=True)
-
-# @app.route('/toggle_motor', methods=['POST'])
-# def toggle_motor():
-#     data = request.json
-#     if data['state'] == 'ON':
-#         GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
-#         # Handles direction
-#         GPIO.output(Motor2, GPIO.LOW)
-#         GPIO.output(Motor3, GPIO.HIGH) 
-#     else:
-#         GPIO.output(Motor1, GPIO.LOW)  # Sets it off
-#         # Handles direction
-#         GPIO.output(Motor2, GPIO.LOW)
-#         GPIO.output(Motor3, GPIO.HIGH)
-#     return jsonify(success=True)
-
-# @app.route('/respond_fan', methods=['POST'])
-# def respond_fan():
-#     data = request.json
-#     if data['response'] == 'yes':
-#         GPIO.output(Motor1, GPIO.HIGH)  # Turn on the fan
-#         return jsonify(success=True, message="Fan turned on.")
-#     else:
-#         return jsonify(success=False, message="No action taken.")
 
 if __name__ == "__main__":
     # Start the temperature monitoring loop in a separate thread
