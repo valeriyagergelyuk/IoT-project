@@ -11,6 +11,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email import policy
 from email.parser import BytesParser
+import atexit
 
 app = Flask(__name__)
 
@@ -37,6 +38,12 @@ GPIO.setup(Motor2, GPIO.OUT)
 GPIO.setup(Motor3, GPIO.OUT)
 
 data = {'temperature': temp, 'humidity': hum}
+
+def clean_up_before_exit():
+    print(" Cleaning...")
+    GPIO.cleanup()
+
+atexit.register(clean_up_before_exit)
 
 def send_email():
     sender_email = "moars700@gmail.com"
