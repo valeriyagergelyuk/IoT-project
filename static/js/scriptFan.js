@@ -1,3 +1,5 @@
+setInterval(getEmailResult,500);
+
 
 function changeFanImages(emailResult) {
     if(emailResult === "False") {
@@ -12,14 +14,7 @@ function changeFanImages(emailResult) {
 }
 
 function getEmailResult() {
-    fetch('/get_DHT_11'
-    //     , {
-    //     method: 'GET',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    // }
-        )
+    fetch('/get_DHT_11')
         .then(response => response.json())
         .then(data => {
             changeFanImages(data.fanStatus);
