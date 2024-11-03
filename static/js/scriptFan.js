@@ -2,7 +2,7 @@ setInterval(getEmailResult,500);
 
 
 function changeFanImages(emailResult) {
-    if(emailResult === "False") {
+    if(emailResult == "Off") {
         // document.getElementById('lightSwitch').src='../static/images/offSwitch.jpg';
          document.getElementById('fanState').src='../static/images/fanOff.jpg';
     } 
@@ -18,6 +18,10 @@ function getEmailResult() {
         .then(response => response.json())
         .then(data => {
             changeFanImages(data.fanStatus);
+            // temp.refresh(data.temperature);
+            // hum.refresh(data.humidity);
+            // document.getElementById('temp').getAttribute('value')==data.temperature;
+            // document.getElementById('hum').getAttribute('value')==data.humidity;
         });
 }
 

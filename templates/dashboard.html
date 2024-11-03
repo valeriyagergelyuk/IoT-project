@@ -53,6 +53,17 @@
                 label: humidity + "%"
                 });
             }
+
+            setInterval(getTempResult, 500);
+
+            function getTempResult() {
+                fetch('/get_DHT_11')
+                .then(response => response.json())
+                .then(data => {
+                    temp.refresh(data.temperature, 50, 0, data.temperature + " Celcius");
+                    hum.refresh(data.humidity, 100, 0, data.humidity + "%");
+                });
+            }
         </script>
     </body>
 </html>

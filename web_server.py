@@ -136,8 +136,9 @@ def capture_email(date_email_sent):
                     if first_line == 'Yes':
                         yes_mail_received = True
                         print("Fan Turning On")
-                        #toggle_motor(first_line)
                         fan_on = True
+                        toggle_motor(first_line)
+                        
 
                         # this will get rid of the emai after it has seen it
                         mail.store(email_id, '+FLAGS', '\\Deleted')
@@ -226,7 +227,7 @@ def loop():
         elif temperature <= 20:
             email_sent = False  # Reset the flag if temperature goes below 24
             # This should automatically turn off the motor 
-            #toggle_motor(motor_switch)
+            toggle_motor(motor_switch)
 
         time.sleep(3)
 
@@ -245,7 +246,14 @@ def toggle_led():
 
 @app.route('/get_DHT_11')
 def chage_fan_img():
-    data = {'fanStatus': fan_on}
+    fan_status = ""
+    if(fan_on == True):
+        fan_status = "On"
+    else:
+        fan_status = "Off"
+    hum = dht.getHumidity()
+    temp = dht.getTemperature()
+    data = {'fanStatus': fan_status, 'temperature': temp, 'humidity': hum}
     return jsonify(data)
 
 if __name__ == "__main__":
