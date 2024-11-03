@@ -1,25 +1,28 @@
 
 function changeFanImages(emailResult) {
-    if(emailResult === "No") {
-        document.getElementById('lightSwitch').src='../static/images/offSwitch.jpg';
+    if(emailResult === "False") {
+        // document.getElementById('lightSwitch').src='../static/images/offSwitch.jpg';
          document.getElementById('fanState').src='../static/images/fanOff.jpg';
     } 
     else 
     {
-        document.getElementById('lightSwitch').src='../static/images/onSwitch.jpg';
+        // document.getElementById('lightSwitch').src='../static/images/onSwitch.jpg';
         document.getElementById('fanState').src='../static/images/fanOn.jpg';
     }
 }
 
 function getEmailResult() {
-    fetch('/get_DHT_11', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    }
-        ).then((response) => {
-            return response.json();
+    fetch('/get_DHT_11'
+    //     , {
+    //     method: 'GET',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    // }
+        )
+        .then(response => response.json())
+        .then(data => {
+            changeFanImages(data.fanStatus);
         });
 }
 

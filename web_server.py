@@ -42,6 +42,8 @@ GPIO.setup(Motor3, GPIO.OUT)
 
 data = {'temperature': temp, 'humidity': hum}
 
+fan_on = False
+
 def clean_up_before_exit():
     print(" Cleaning...")
     GPIO.cleanup()
@@ -49,9 +51,9 @@ def clean_up_before_exit():
 atexit.register(clean_up_before_exit)
 
 def send_email():
-    sender_email = "moars700@gmail.com"
-    sender_password = "ucgu qkwh ltab zapt" # in App password
-    recipient_email = "giannouleaschris@gmail.com"
+    sender_email = "kuru.rishi@gmail.com"
+    sender_password = "tqqa cjrd shht tlwm" # in App password
+    recipient_email = "kuru.rishi@gmail.com"
 
     subject = "Temperature Alert"
     body = "The temperature has exceeded 24 degrees Celsius."
@@ -78,12 +80,13 @@ def send_email():
 
 def capture_email(date_email_sent):
     yes_mail_received = False
+    #mail_received = False
     tries = 4
     global dht_is_running
     dht_thread = threading.Thread(target=dht_loop, daemon=True)
 
-    sender_email = "moars700@gmail.com"
-    sender_password = "ucgu qkwh ltab zapt"
+    sender_email = "kuru.rishi@gmail.com"
+    sender_password = "tqqa cjrd shht tlwm"
     mail = imaplib.IMAP4_SSL('smtp.gmail.com')
 
     #logging in
@@ -133,7 +136,8 @@ def capture_email(date_email_sent):
                     if first_line == 'Yes':
                         yes_mail_received = True
                         print("Fan Turning On")
-                        toggle_motor(first_line)
+                        #toggle_motor(first_line)
+                        fan_on = True
 
                         # this will get rid of the emai after it has seen it
                         mail.store(email_id, '+FLAGS', '\\Deleted')
@@ -222,7 +226,7 @@ def loop():
         elif temperature <= 20:
             email_sent = False  # Reset the flag if temperature goes below 24
             # This should automatically turn off the motor 
-            toggle_motor(motor_switch)
+            #toggle_motor(motor_switch)
 
         time.sleep(3)
 
@@ -238,6 +242,11 @@ def toggle_led():
     else:
         GPIO.output(LED_PIN, GPIO.LOW)
     return jsonify(success=True)
+
+@app.route('/get_DHT_11')
+def chage_fan_img():
+    data = {'fanStatus': fan_on}
+    return jsonify(data)
 
 if __name__ == "__main__":
     # Start the temperature monitoring loop in a separate thread
