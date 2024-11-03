@@ -253,6 +253,7 @@ def chage_fan_img():
         fan_status = "Off"
     hum = dht.getHumidity()
     temp = dht.getTemperature()
+    # print(hum)
     data = {'fanStatus': fan_status, 'temperature': temp, 'humidity': hum}
     return jsonify(data)
 
