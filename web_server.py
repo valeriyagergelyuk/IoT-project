@@ -31,6 +31,12 @@ sumCnt = 0
 okCnt = 0
 dht_is_running = True
 
+sender_email = "moars700@gmail.com"
+sender_password = "ucgu qkwh ltab zapt" # in App password
+recipient_email = "giannouleaschris@gmail.com"
+
+aa = ''
+
 # For Motor
 Motor1 = 22  # Enable Pin
 Motor2 = 27  # Input Pin 1
@@ -51,12 +57,8 @@ def clean_up_before_exit():
 atexit.register(clean_up_before_exit)
 
 def send_email():
-    sender_email = "kuru.rishi@gmail.com"
-    sender_password = "tqqa cjrd shht tlwm" # in App password
-    recipient_email = "kuru.rishi@gmail.com"
-
     subject = "Temperature Alert"
-    body = "The temperature has exceeded 24 degrees Celsius."
+    body = "The temperature has exceeded 24 degrees Celsius. Would You like to turn on the fan? Reply with Yes to turn on the fan."
 
     
     msg = MIMEMultipart()
@@ -80,13 +82,12 @@ def send_email():
 
 def capture_email(date_email_sent):
     yes_mail_received = False
+    global aa
     #mail_received = False
     tries = 4
     global dht_is_running
     dht_thread = threading.Thread(target=dht_loop, daemon=True)
 
-    sender_email = "kuru.rishi@gmail.com"
-    sender_password = "tqqa cjrd shht tlwm"
     mail = imaplib.IMAP4_SSL('smtp.gmail.com')
 
     #logging in
@@ -155,6 +156,7 @@ def capture_email(date_email_sent):
 
                 if(yes_mail_received == True):
                     dht_is_running = False
+                    aa = 'Yes'
                     break
         
         ## Now the email will wait for a yes always, but if user says no, it won't resend if it dropps down to below 24, then comes back up uptill the user says yes, should that be changed?
@@ -169,6 +171,14 @@ def capture_email(date_email_sent):
         #if(tries == 0):
         #    print("Failed to recieve email")
         #    break
+
+@app.route('/get_data')
+def returnCurrentDataValues():
+    global aa
+    data = {'IsFanMeantToBeOn': aa}
+    return jsonify(data)
+
+
 def dht_loop():
     global hum, temp, sumCnt, okCnt
 
@@ -256,6 +266,8 @@ def chage_fan_img():
     # print(hum)
     data = {'fanStatus': fan_status, 'temperature': temp, 'humidity': hum}
     return jsonify(data)
+
+
 
 if __name__ == "__main__":
     # Start the temperature monitoring loop in a separate thread
