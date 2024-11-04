@@ -24,6 +24,8 @@ GPIO.setwarnings(False)  # Disable warnings
 GPIO.setup(LED_PIN, GPIO.OUT)
 
 # For DHT11
+# We should add a avg system to handle big increases or drops
+# We should also stop -999 from being read
 DHTPin = 13
 dht = DHT(DHTPin)
 dht.readDHT11()
@@ -165,15 +167,17 @@ def dht_loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        temperature = random.randint(20, 30) #dht.getTemperature()
-        humditiy = random.randint(20, 30) #dht.getHumidity()
+        temperature = dht.getTemperature()
+        humditiy = dht.getHumidity()
 
-        print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
-        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, humditiy, temperature))
 
         # Update humidity and temperature for the web server
         hum = humditiy
         temp = temperature
+        
+        print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
+        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, humditiy, temperature))
+
         time.sleep(3)
 
 def toggle_motor(emailResult):
@@ -198,21 +202,22 @@ def loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        temperature = random.randint(20, 30) #dht.getTemperature()
-        humditiy = random.randint(20, 30) #dht.getHumidity()
+        temperature = dht.getTemperature()
+        humditiy = dht.getHumidity()
 
-        print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
-        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,humditiy, temperature))
 
         # Update humidity and temperature for the web server
         hum = humditiy
         temp = temperature
 
+        print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
+        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,humditiy, temperature))
+
         # Check temperature and send email if necessary
-        if temperature > 24 and not email_sent:
+        if temperature > 21 and not email_sent:
             send_email() 
             email_sent = True  # Set flag to indicate email has been sent
-        elif temperature <= 24:
+        elif temperature <= 22:
             email_sent = False  # Reset the flag if temperature goes below 24
             # This should automatically turn off the motor 
             toggle_motor('off')
