@@ -14,10 +14,10 @@ function getTempResult() {
     fetch('/get_data')
     .then(response => response.json())
     .then(data => {
-        temp.refresh(data.Temperature, 50, 0, data.Temperature + " Celcius");
-        hum.refresh(data.Humidity, 100, 0, data.Humidity + "%");
+        temp.refresh(data.Temperature);
+        hum.refresh(data.Humidity);
+
         console.log(data);
-        console.log(data.IsFanMeantToBeOn);
         changeFanImages(data.IsFanMeantToBeOn);
     });
 }

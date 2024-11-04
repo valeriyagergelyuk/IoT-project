@@ -26,8 +26,9 @@
         </div>
         
         <div id="container">
-        <div id="temp"></div>
-        <div id="hum"></div></div>
+            <div id="tempGuage"></div>
+            <div id="humGuage"></div>
+        </div>
 
         <script src="{{ url_for('static', filename='gauge_files/raphael-2.1.4.min.js') }}"></script>        
         <script src="{{ url_for('static', filename='gauge_files/justgage.js') }}"></script>
@@ -35,24 +36,28 @@
             var temp, hum;
             window.onload = function(){
                 temp = new JustGage({
-                id: "temp",
+                id: "tempGuage",
                 value: temperature,
                 min: 0,
                 max: 50,
                 title: "Temperature",
-                label: temperature + " Celcius"
+                valueFontColor: '#ffffff',
+                labelFontColor: '#ffffff',
+                symbol: "°C"
                 });
 
                 hum = new JustGage({
-                id: "hum",
+                id: "humGuage",
                 value: humidity,
                 min: 0,
                 max: 100,
                 title: "Humidity",
-                label: humidity + "%"
+                valueFontColor: '#ffffff',
+                labelFontColor: '#ffffff',
+                symbol: "%"
                 });
+                setInterval(getTempResult, 3000);
             }
-            setInterval(getTempResult, 3000);
         </script>
     </body>
 </html>

@@ -12,6 +12,8 @@ from email.mime.multipart import MIMEMultipart
 from email import policy
 from email.parser import BytesParser
 import atexit
+# Test Sake
+import random
 
 app = Flask(__name__)
 
@@ -29,7 +31,7 @@ hum = dht.getHumidity()
 temp = dht.getTemperature()
 sumCnt = 0
 okCnt = 0
-dht_is_running = True
+dht_is_running = False
 
 # For Email
 sender_email = "moars700@gmail.com"
@@ -74,13 +76,15 @@ def send_email():
         print(f"Error sending email: {e}")
 
 def capture_email(date_email_sent):
-    yes_mail_received = False
     global fan_on
     global dht_is_running
+    yes_mail_received = False
 
     # Allows the probing to work while waiting for email
-    dht_thread = threading.Thread(target=dht_loop, daemon=True)
-    dht_thread.start()
+    if not dht_is_running:
+        dht_is_running = True
+        dht_thread = threading.Thread(target=dht_loop, daemon=True)
+        dht_thread.start()
 
     mail = imaplib.IMAP4_SSL('smtp.gmail.com')
     mail.login(sender_email, sender_password)
@@ -140,9 +144,9 @@ def capture_email(date_email_sent):
                         mail.expunge()
 
                 if(yes_mail_received == True):
-                    # Stops the thread
-                    dht_is_running = False
                     break
+    # Stops the thread
+    dht_is_running = False
         
         ## Now the email will wait for a yes always, but if user says no, it won't resend if it dropps down to below 24,
         ## then comes back up uptill the user says yes, should that be changed?
@@ -161,8 +165,8 @@ def dht_loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        temperature = 25 #dht.getTemperature()
-        humditiy = dht.getHumidity()
+        temperature = random.randint(20, 30) #dht.getTemperature()
+        humditiy = random.randint(20, 30) #dht.getHumidity()
 
         print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
         print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, humditiy, temperature))
@@ -194,8 +198,8 @@ def loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        temperature = 25 #dht.getTemperature()
-        humditiy = dht.getHumidity()
+        temperature = random.randint(20, 30) #dht.getTemperature()
+        humditiy = random.randint(20, 30) #dht.getHumidity()
 
         print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
         print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,humditiy, temperature))
