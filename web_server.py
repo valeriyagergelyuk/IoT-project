@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import time
-import threading  # Import threading
+import threading
 import RPi.GPIO as GPIO
 import smtplib
 import imaplib
@@ -31,11 +31,10 @@ sumCnt = 0
 okCnt = 0
 dht_is_running = True
 
+# For Email
 sender_email = "moars700@gmail.com"
 sender_password = "ucgu qkwh ltab zapt" # in App password
 recipient_email = "giannouleaschris@gmail.com"
-
-aa = ''
 
 # For Motor
 Motor1 = 22  # Enable Pin
@@ -46,21 +45,16 @@ GPIO.setup(Motor1, GPIO.OUT)
 GPIO.setup(Motor2, GPIO.OUT)
 GPIO.setup(Motor3, GPIO.OUT)
 
-data = {'temperature': temp, 'humidity': hum}
-
 fan_on = False
 
 def clean_up_before_exit():
     print(" Cleaning...")
     GPIO.cleanup()
 
-atexit.register(clean_up_before_exit)
-
 def send_email():
     subject = "Temperature Alert"
     body = "The temperature has exceeded 24 degrees Celsius. Would You like to turn on the fan? Reply with Yes to turn on the fan."
 
-    
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = recipient_email
@@ -75,26 +69,21 @@ def send_email():
             date_email_sent = datetime.now()
             print("Email sent successfully!")
             time.sleep(5)
-
             capture_email(date_email_sent)
     except Exception as e:
         print(f"Error sending email: {e}")
 
 def capture_email(date_email_sent):
     yes_mail_received = False
-    global aa
-    #mail_received = False
-    tries = 4
+    global fan_on
     global dht_is_running
-    dht_thread = threading.Thread(target=dht_loop, daemon=True)
 
-    mail = imaplib.IMAP4_SSL('smtp.gmail.com')
-
-    #logging in
-    mail.login(sender_email, sender_password)
-
+    # Allows the probing to work while waiting for email
     dht_thread = threading.Thread(target=dht_loop, daemon=True)
     dht_thread.start()
+
+    mail = imaplib.IMAP4_SSL('smtp.gmail.com')
+    mail.login(sender_email, sender_password)
 
     #looping while the email has not been received
     while yes_mail_received == False:
@@ -138,46 +127,29 @@ def capture_email(date_email_sent):
                         yes_mail_received = True
                         print("Fan Turning On")
                         fan_on = True
+                        # Activates the motor
                         toggle_motor(first_line)
-                        
-
                         # this will get rid of the emai after it has seen it
                         mail.store(email_id, '+FLAGS', '\\Deleted')
                         mail.expunge()
 
-                        # It should change the image here, but I am not sure how to call a js from python
-
                     elif first_line != None:
-                        print("Fan Not Turning On")
                         yes_mail_received = False
-                        # this will get rid of the emai after it has seen it
+                        print("Fan Not Turning On")
                         mail.store(email_id, '+FLAGS', '\\Deleted')
                         mail.expunge()
 
                 if(yes_mail_received == True):
+                    # Stops the thread
                     dht_is_running = False
-                    aa = 'Yes'
                     break
         
-        ## Now the email will wait for a yes always, but if user says no, it won't resend if it dropps down to below 24, then comes back up uptill the user says yes, should that be changed?
+        ## Now the email will wait for a yes always, but if user says no, it won't resend if it dropps down to below 24,
+        ## then comes back up uptill the user says yes, should that be changed?
 
         ## not sure if we should have a limiter of some kind incase the user never replies or the email just fails to send
         ## Rn if something happens to the email where it just never gets sent, it will wait infinty for the response (Atleast i think it would)
         ## Maybe there shuold be something to just resend it after it checks for a response 5 times
-
-        #tries = tries - 1
-        #print("Retrying...")                   
-        #time.sleep(5)
-        #if(tries == 0):
-        #    print("Failed to recieve email")
-        #    break
-
-@app.route('/get_data')
-def returnCurrentDataValues():
-    global aa
-    data = {'IsFanMeantToBeOn': aa}
-    return jsonify(data)
-
 
 def dht_loop():
     global hum, temp, sumCnt, okCnt
@@ -189,30 +161,31 @@ def dht_loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        temperature = 24
+        temperature = 25 #dht.getTemperature()
+        humditiy = dht.getHumidity()
 
         print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
-        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, dht.getHumidity(), temperature))
+        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, humditiy, temperature))
 
         # Update humidity and temperature for the web server
-        hum = dht.getHumidity()
+        hum = humditiy
         temp = temperature
         time.sleep(3)
 
 def toggle_motor(emailResult):
-    
+    global fan_on
     if emailResult == 'Yes':
         GPIO.output(Motor1, GPIO.HIGH)  # Sets it on
         # Handles direction
         GPIO.output(Motor2, GPIO.LOW)
         GPIO.output(Motor3, GPIO.HIGH) 
     else:
+        fan_on = False
         GPIO.output(Motor1, GPIO.LOW)  # Sets it off
 
 def loop():
     global hum, temp, sumCnt, okCnt
     email_sent = False  # Flag to track if the email has been sent
-    motor_switch = 'off'
 
     while True:
         sumCnt += 1
@@ -221,30 +194,32 @@ def loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        temperature = 24
+        temperature = 25 #dht.getTemperature()
+        humditiy = dht.getHumidity()
 
         print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
-        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, dht.getHumidity(), temperature))
+        print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,humditiy, temperature))
 
         # Update humidity and temperature for the web server
-        hum = dht.getHumidity()
+        hum = humditiy
         temp = temperature
 
         # Check temperature and send email if necessary
-        if temperature > 20 and not email_sent:
-            send_email()  # Send email
+        if temperature > 24 and not email_sent:
+            send_email() 
             email_sent = True  # Set flag to indicate email has been sent
-        elif temperature <= 20:
+        elif temperature <= 24:
             email_sent = False  # Reset the flag if temperature goes below 24
             # This should automatically turn off the motor 
-            toggle_motor(motor_switch)
-
+            toggle_motor('off')
         time.sleep(3)
 
+# Loads the webpage
 @app.route("/") 
 def home(): 
     return render_template('dashboard.html', data={'temperature': temp, 'humidity': hum}) 
 
+# Toggles the led on the breadboard when the image changes
 @app.route('/toggle_led', methods=['POST'])
 def toggle_led():
     data = request.json
@@ -254,23 +229,22 @@ def toggle_led():
         GPIO.output(LED_PIN, GPIO.LOW)
     return jsonify(success=True)
 
-@app.route('/get_DHT_11')
-def chage_fan_img():
-    fan_status = ""
-    if(fan_on == True):
-        fan_status = "On"
-    else:
-        fan_status = "Off"
-    hum = dht.getHumidity()
-    temp = dht.getTemperature()
-    # print(hum)
-    data = {'fanStatus': fan_status, 'temperature': temp, 'humidity': hum}
+# Gets information on fan state, temperature and humditiy to display on the webpage
+@app.route('/get_data')
+def returnCurrentDataValues():
+    global fan_on
+    global hum
+    global temp
+    data = {'IsFanMeantToBeOn': fan_on, "Temperature": temp, "Humidity": hum}
     return jsonify(data)
 
-
+# Activates the function to be called when shutdown
+atexit.register(clean_up_before_exit)
 
 if __name__ == "__main__":
-    # Start the temperature monitoring loop in a separate thread
+    # Creates a thread to have it constantly check if it should send a email
+    ## Im not sure why there a thread here, it has while True: which should never end?
+    ## I think it should just call the function here
     threading.Thread(target=loop, daemon=True).start()
     
     app.run(host='0.0.0.0', port=5000) 

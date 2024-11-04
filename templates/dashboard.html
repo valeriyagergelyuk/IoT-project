@@ -19,7 +19,6 @@
             <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px">
         </div>
 
-
         <div id="container">
             <h1 id="titletext">motor test</h1>
             <!-- <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleFan()">  -->
@@ -53,17 +52,7 @@
                 label: humidity + "%"
                 });
             }
-
-            setInterval(getTempResult, 500);
-
-            function getTempResult() {
-                fetch('/get_DHT_11')
-                .then(response => response.json())
-                .then(data => {
-                    temp.refresh(data.temperature, 50, 0, data.temperature + " Celcius");
-                    hum.refresh(data.humidity, 100, 0, data.humidity + "%");
-                });
-            }
+            setInterval(getTempResult, 3000);
         </script>
     </body>
 </html>
