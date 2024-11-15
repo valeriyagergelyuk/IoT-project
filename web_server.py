@@ -3,6 +3,13 @@ import time
 import threading
 import RPi.GPIO as GPIO
 import atexit
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email import policy
+from email.parser import BytesParser
+import smtplib
+import imaplib
+from datetime import datetime
 
 import paho.mqtt.subscribe as subscribe
 
@@ -14,13 +21,12 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(LED_PIN, GPIO.OUT)
 
-# For PhotoResistor
-int photoResistorPin = 4
-
 # For Email
 sender_email = "moars700@gmail.com"
 sender_password = "ucgu qkwh ltab zapt" # in App password
 recipient_email = "giannouleaschris@gmail.com"
+
+email_sent = False
 
 def clean_up_before_exit():
     print(" Cleaning...")
@@ -28,7 +34,6 @@ def clean_up_before_exit():
 
 def send_email():
     subject = "Light Alert"
-
     body = "The Light is ON at hh: mm time."
 
     msg = MIMEMultipart()
@@ -42,27 +47,26 @@ def send_email():
             server.starttls() 
             server.login(sender_email, sender_password)  
             server.send_message(msg) 
-            date_email_sent = datetime.now()
+            date_email_sessnt = datetime.now()
             print("Email sent successfully!")
-            time.sleep(5)
     except Exception as e:
         print(f"Error sending email: {e}")
 
 def loop():
+    global email_sent
     while True:
-        msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.48.140")
+        msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.167.140")
         print("%s %s" % (msg.topic, msg.payload))
 
-        int lightpin = analogRead(photoResistorPin)
 
-        print(lightpin)
+        light_value = int(msg.payload.decode('utf-8'))
 
-        if(lightpin >= 400)
-        {
-            send_email()
-        }
-
-        time.sleep(3)
+        if(light_value <= 400 and not email_sent):
+           send_email()
+           email_sent = True
+        elif(light_value > 400):
+            email_sent = False
+        time.sleep(1)
 
 # Loads the webpage
 @app.route("/") 
