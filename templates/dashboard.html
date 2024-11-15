@@ -14,11 +14,10 @@
     </head>
     <body id="mainbody">
         <div id="container">
-            <h1 id="titletext">Motor Test</h1>
-            <img id="fanSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleFan()"> 
-            <img id="fanState" src="../static/images/fanOff.jpg" style="width:300px">
+            <h1 id="titletext">Toggle the switch</h1>
+            <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()"> 
+            <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px">
         </div>
-
 
         <div id="container">
             <h1 id="titletext">motor test</h1>
@@ -27,8 +26,9 @@
         </div>
         
         <div id="container">
-        <div id="temp"></div>
-        <div id="hum"></div></div>
+            <div id="tempGuage"></div>
+            <div id="humGuage"></div>
+        </div>
 
         <script src="{{ url_for('static', filename='gauge_files/raphael-2.1.4.min.js') }}"></script>        
         <script src="{{ url_for('static', filename='gauge_files/justgage.js') }}"></script>
@@ -36,33 +36,27 @@
             var temp, hum;
             window.onload = function(){
                 temp = new JustGage({
-                id: "temp",
+                id: "tempGuage",
                 value: temperature,
                 min: 0,
                 max: 50,
                 title: "Temperature",
-                label: temperature + " Celcius"
+                valueFontColor: '#ffffff',
+                labelFontColor: '#ffffff',
+                symbol: "°C"
                 });
 
                 hum = new JustGage({
-                id: "hum",
+                id: "humGuage",
                 value: humidity,
                 min: 0,
                 max: 100,
                 title: "Humidity",
-                label: humidity + "%"
+                valueFontColor: '#ffffff',
+                labelFontColor: '#ffffff',
+                symbol: "%"
                 });
-            }
-
-            setInterval(getTempResult, 500);
-
-            function getTempResult() {
-                fetch('/get_DHT_11')
-                .then(response => response.json())
-                .then(data => {
-                    temp.refresh(data.temperature, 50, 0, data.temperature + " Celcius");
-                    hum.refresh(data.humidity, 100, 0, data.humidity + "%");
-                });
+                setInterval(getTempResult, 3000);
             }
         </script>
     </body>

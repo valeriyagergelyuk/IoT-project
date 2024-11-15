@@ -15,6 +15,9 @@ import paho.mqtt.subscribe as subscribe
 
 app = Flask(__name__)
 
+hum = 30
+temp = 20
+
 # For LED
 LED_PIN = 19
 GPIO.setmode(GPIO.BCM)
