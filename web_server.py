@@ -30,20 +30,26 @@ sender_password = "ucgu qkwh ltab zapt" # in App password
 recipient_email = "giannouleaschris@gmail.com"
 
 email_sent = False
+email_body = ""
+light_value = 0
 
 def clean_up_before_exit():
     print(" Cleaning...")
     GPIO.cleanup()
 
 def send_email():
+    global email_body
+    current_time = datetime.now()
+    formatted_time = current_time.strftime("%H:%M")
+
     subject = "Light Alert"
-    body = "The Light is ON at hh: mm time."
+    email_body = f"The light was turned on at {formatted_time}"
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = recipient_email
     msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
+    msg.attach(MIMEText(email_body, 'plain'))
 
     try:
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
@@ -57,6 +63,7 @@ def send_email():
 
 def loop():
     global email_sent
+    global light_value
     while True:
         msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.167.140")
         print("%s %s" % (msg.topic, msg.payload))
@@ -75,6 +82,14 @@ def loop():
 @app.route("/") 
 def home(): 
     return render_template('dashboard.html', data={'temperature': temp, 'humidity': hum}) 
+
+@app.route('/get_email_and_light_data')
+def returnCurrentDataValues():
+    global email_sent
+    global light_value
+    global email_body
+    data = {'Light Amount': light_value, "isEmailSent": email_sent, "emailBody": email_body}
+    return jsonify(data)
 
 # Toggles the led on the breadboard
 @app.route('/toggle_led', methods=['POST'])

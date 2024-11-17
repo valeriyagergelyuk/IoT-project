@@ -11,7 +11,7 @@ function changeFanImages(emailResult) {
 }
 
 function getTempResult() {
-    fetch('/get_data')
+    fetch('/get_temp_data')
     .then(response => response.json())
     .then(data => {
         temp.refresh(data.Temperature);

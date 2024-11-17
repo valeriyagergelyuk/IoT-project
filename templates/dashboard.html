@@ -26,13 +26,15 @@
         </div>
         
         <div id="container">
-            <div id="tempGuage"></div>
-            <div id="humGuage"></div>
+            <!-- <div id="tempGuage"></div> -->
+            <!-- <div id="humGuage"></div> -->
+             <p id="emailText"></p>
         </div>
 
         <script src="{{ url_for('static', filename='gauge_files/raphael-2.1.4.min.js') }}"></script>        
         <script src="{{ url_for('static', filename='gauge_files/justgage.js') }}"></script>
         <script>
+            /*
             var temp, hum;
             window.onload = function(){
                 temp = new JustGage({
@@ -58,6 +60,9 @@
                 });
                 setInterval(getTempResult, 3000);
             }
+            */
+            setInterval(getEmailLightData, 2000);
+            
         </script>
     </body>
 </html>

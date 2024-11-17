@@ -26,4 +26,20 @@ function changeLedImages(ledState) {
          document.getElementById('lightSwitch').src='../static/images/onSwitch.jpg';
          document.getElementById('lightbulb').src='../static/images/lightOn.png';
      }
- }
+}
+
+function getEmailLightData()
+{
+    fetch('/get_email_and_light_data')
+    .then(response => response.json())
+    .then(data => {
+
+        if (data["isEmailSent"]) {
+        document.getElementById("emailText").innerText = data["emailBody"];
+        }
+        else {
+            document.getElementById("emailText").innerText = "";
+        }
+        console.log(data);
+    });
+}

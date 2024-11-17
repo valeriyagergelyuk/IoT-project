@@ -20,6 +20,11 @@
     font-family: 'Courier New', Courier, monospace;
 }
 
+#emailText{
+    color: aliceblue;
+    font-family: 'Courier New', Courier, monospace;
+}
+
 #lightSwitch{
     padding: 40px;
 }

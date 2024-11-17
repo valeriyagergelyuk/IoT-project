@@ -242,7 +242,7 @@ def toggle_led():
     return jsonify(success=True)
 
 # Gets information on fan state, temperature and humditiy to display on the webpage
-@app.route('/get_data')
+@app.route('/get_temp_data')
 def returnCurrentDataValues():
     global fan_on
     global hum
