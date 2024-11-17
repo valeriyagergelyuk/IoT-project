@@ -33,11 +33,14 @@ function getEmailLightData()
     fetch('/get_email_and_light_data')
     .then(response => response.json())
     .then(data => {
-
+        document.getElementById("lightIntensity").innerText = "Light intensity: " + data["Light Amount"];
+        document.getElementById("lightGauge").value = "" + data["Light Amount"];
         if (data["isEmailSent"]) {
-        document.getElementById("emailText").innerText = data["emailBody"];
+            document.getElementById('lightbulb').src='../static/images/lightOn.png';
+            document.getElementById("emailText").innerText = data["emailBody"];
         }
         else {
+            document.getElementById('lightbulb').src='../static/images/lightOff.png';
             document.getElementById("emailText").innerText = "";
         }
         console.log(data);

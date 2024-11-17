@@ -65,7 +65,8 @@ def loop():
     global email_sent
     global light_value
     while True:
-        msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.167.140")
+        # msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.167.140")
+        msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.1.18")
         print("%s %s" % (msg.topic, msg.payload))
 
 

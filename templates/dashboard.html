@@ -13,23 +13,28 @@
         <link rel="stylesheet" href="../static/style.css">
     </head>
     <body id="mainbody">
-        <div id="container">
-            <h1 id="titletext">Toggle the switch</h1>
-            <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()"> 
-            <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px">
+        <div id="container_led">
+            <h1 id="titletext">Light Turning on</h1>
+            <!-- <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()">  -->
+            <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px"><br>
+            <meter id="lightGauge" value="0" min="0" max="5000" high="4000" low="400"></meter>
+             <p id="lightIntensity">Light intensity: 0</p>
+             <p id="emailText"></p>
+             
+             
         </div>
-
+<!-- 
         <div id="container">
             <h1 id="titletext">motor test</h1>
-            <!-- <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleFan()">  -->
             <img id="fanState" src="../static/images/fanOff.jpg" style="width:300px">
-        </div>
+        </div> -->
         
-        <div id="container">
-            <!-- <div id="tempGuage"></div> -->
-            <!-- <div id="humGuage"></div> -->
-             <p id="emailText"></p>
-        </div>
+        <!-- <div id="container">
+            
+            <div id="tempGuage"></div> 
+            <div id="humGuage"></div>
+           
+        </div> -->
 
         <script src="{{ url_for('static', filename='gauge_files/raphael-2.1.4.min.js') }}"></script>        
         <script src="{{ url_for('static', filename='gauge_files/justgage.js') }}"></script>
