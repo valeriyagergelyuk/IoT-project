@@ -23,22 +23,30 @@
     background-color:rgb(37, 37, 37);
     border-radius: 5px;
 }
-
+#container_prefernces {
+    display: block;
+    padding: 20px;
+    margin: auto;
+    margin-top: 20px;
+    width: 300px;
+    /* padding-top: 100px; */
+    text-align: center;
+    background-color:rgb(37, 37, 37);
+    border-radius: 5px;
+}
+#background_container {
+    background-color: rgb(48, 9, 9);
+    padding: 20px;
+    border-radius: 5px;
+}
 #mainbody{
     background-color: rgb(0, 0, 0);
 }
-
-#titletext{
-    color: aliceblue;
-    font-family: 'Courier New', Courier, monospace;
+#flex_body {
+    display: flex;
 }
 
-#emailText{
-    color: aliceblue;
-    font-family: 'Courier New', Courier, monospace;
-}
-
-#lightIntensity{
+.generalText {
     color: aliceblue;
     font-family: 'Courier New', Courier, monospace;
 }
@@ -55,7 +63,12 @@
     width:300px; height:200px;
     display: inline-block;
     margin: 1em;
-  }
+}
+
+.guage {
+    /* width:200px; 
+    height:100px; */
+}
 
 meter{
     width: 200px;

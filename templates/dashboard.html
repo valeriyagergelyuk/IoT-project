@@ -12,34 +12,48 @@
         <script src="{{ url_for('static', filename='js/scriptFan.js') }}"></script>
         <link rel="stylesheet" href="../static/style.css">
     </head>
+
     <body id="mainbody">
-        <div id="container_led">
-            <h1 id="titletext">Light Turning on</h1>
-            <!-- <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()">  -->
-            <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px"><br>
-            <meter id="lightGauge" value="0" min="0" max="5000" high="4000" low="400"></meter>
-             <p id="lightIntensity">Light intensity: 0</p>
-             <p id="emailText"></p>
-             
-             
+        <div id="background_container">
+        <div id="container_prefernces">
+            <h1 class="generalText">Your Prefences</h1>
+            <p class="generalText">Minimum Light Level: </p>
+            <p class="generalText">Maximum Temperature: </p>
+            <a href="http://127.0.0.1:5000/editPreferences">Edit</a>
+        </div> 
+
+        <div id="flex_body">
+            <div id="container_led">
+                <h1 class="generalText">Room Lighting</h1>
+                <!-- <img id="lightSwitch" src="../static/images/offSwitch.jpg" style="width:100px" onclick="toggleLED()">  -->
+                <img id="lightbulb" src="../static/images/lightOff.png" style="width:100px"><br>
+                <meter id="lightGauge" value="0" min="0" max="5000" high="4000" low="400"></meter>
+                <p class="generalText">Light intensity: 0</p>
+                <p class="generalText"></p>
+            </div>
+
+            <div id="container_led">
+                <h1 class="generalText">Fan Status</h1>
+                <img id="fanState" src="../static/images/fanOff.jpg" style="width:300px">
+                
+            </div>
+            <div id="container_led">
+                <h1 class="generalText">Room Climate</h1>
+                <div class="guage" id="tempGuage"></div> 
+                <div class="guage" id="humGuage"></div>
+            </div> 
+
         </div>
-<!-- 
-        <div id="container">
-            <h1 id="titletext">motor test</h1>
-            <img id="fanState" src="../static/images/fanOff.jpg" style="width:300px">
-        </div> -->
+        </div>
         
-        <!-- <div id="container">
-            
-            <div id="tempGuage"></div> 
-            <div id="humGuage"></div>
-           
-        </div> -->
+
+
+
 
         <script src="{{ url_for('static', filename='gauge_files/raphael-2.1.4.min.js') }}"></script>        
         <script src="{{ url_for('static', filename='gauge_files/justgage.js') }}"></script>
         <script>
-            /*
+            
             var temp, hum;
             window.onload = function(){
                 temp = new JustGage({
@@ -65,7 +79,7 @@
                 });
                 setInterval(getTempResult, 3000);
             }
-            */
+            
             setInterval(getEmailLightData, 2000);
             
         </script>
