@@ -1,6 +1,10 @@
 //This is for esp
 #include <WiFi.h>
 #include <PubSubClient.h>
+//for rfid
+#include <SPI.h>
+#include <MFRC522.h>
+
 // Replace the next variables with your SSID/Password combination
 const char* ssid = "Crackers";
 const char* password = "ChrisDuck";
@@ -17,10 +21,19 @@ int islightReallyFalse = 0;
 const int ledPin = 5;
 const int photoResistorPin = 39;
 
+//RFID pins
+#define SS_PIN 6 // SDA Pin on RC522
+#define RST_PIN 4 // RST Pin on RC522
+
+MFRC522 rfid(SS_PIN, RST_PIN);
+
 void setup() {
   Serial.begin(115200);
   setup_wifi();
 
+  SPI.begin(); 
+  rfid.PCD_Init(); 
+  
   client.setServer(mqtt_server, 1883);
   pinMode(ledPin, OUTPUT);
 }
@@ -57,6 +70,26 @@ void reconnect() {
   }
 }
 
+string checkRfid(){
+  if (!rfid.PICC_IsNewCardPresent()) {
+    return;
+  }
+  if (!rfid.PICC_ReadCardSerial()) {
+    return;
+  }
+
+  string tag_id = "";
+
+  for (byte i = 0; i < rfid.uid.size; i++) {
+    string ind_no = rfid.uid.uidByte[i] < 0x10 ? " 0" : " "; 
+    std::string s {std::to_string(HEX_bufferMessage[rfid.uid.uidByte[i]])};
+    tag_id += s;
+  }
+
+  rfid.PICC_HaltA();
+  return tag_id;
+}
+
 void loop() {
   if (!client.connected()) {
     reconnect();
@@ -68,6 +101,11 @@ void loop() {
   int lightValue = analogRead(photoResistorPin);
   String lightValueStr = String(lightValue);
 
+  string tag_id = checkRfid();
+  if(tag_id != ""){
+    client.publish("IoTlab/RFID", tag_id);  
+  }
+  
   if (atoi(lightValueStr.c_str()) <= 400) {
     islightReallyFalse = 0;
     islightReallyTrue++;
