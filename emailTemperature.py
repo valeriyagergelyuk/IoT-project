@@ -18,7 +18,7 @@ def send_email():
             server.send_message(msg) 
             date_email_sent = datetime.now()
             print("Email sent successfully!")
-            time.sleep(5)
+            time.sleep(5) 
             capture_email(date_email_sent)
     except Exception as e:
         print(f"Error sending email: {e}")

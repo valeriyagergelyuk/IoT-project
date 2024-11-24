@@ -55,3 +55,11 @@ GPIO.setup(Motor3, GPIO.OUT)
 
 #For Light Sensor
 light_value = 0
+
+#for rfid 
+rfid_uid = ""
+user_authenticated = False
+
+#user thresholds (values set by default)
+temp_threshold = 24
+light_threshold = 400
