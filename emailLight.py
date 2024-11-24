@@ -33,7 +33,7 @@ def loop():
 
         light_value = int(msg.payload.decode('utf-8'))
 
-        if(light_value <= 400 and not email_sent):
+        if(light_value <= vars.light_threshold and not email_sent):
            send_email()
            email_sent = True
         elif(light_value > 400):

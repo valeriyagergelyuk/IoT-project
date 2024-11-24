@@ -150,7 +150,7 @@ def loop():
         print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,vars.hum , vars.temp))
 
         # Check temperature and send email if necessary
-        if vars.temp > 21 and not email_sent:
+        if vars.temp > vars.temp_threshold and not email_sent:
             send_email() 
             email_sent = True  # Set flag to indicate email has been sent
         elif vars.temp <= 22:
