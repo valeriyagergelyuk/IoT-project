@@ -44,6 +44,11 @@ def returnCurrentLightingRelatedValues():
     data = {'Light Amount': light_value, "isEmailSent": email_sent, "emailBody": email_body}
     return jsonify(data)
 
+@app.route('/get_user_profile')
+def returnUserProfileValues():
+    data = {'userID': vars.user_id, 'userRFID': vars.rfid_uid, 'isUserLoggedIn':vars.user_authenticated, 'isLoginFailed': vars.user_valid, 'userTempThresh': vars.temp_threshold, 'userLightThresh': vars.light_threshold}
+    return jsonify(data)
+
 if __name__ == "__main__":
     threading.Thread(target=dht_motor.loop, daemon=True).start()
     threading.Thread(target=light_sensor.loop, daemon=True).start()

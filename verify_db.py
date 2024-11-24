@@ -16,14 +16,20 @@ def fetch_all_profiles():
     return profiles
 
 def check_user_rfid(rfid_id):
+    logged_in = False
     if(rfid_id != vars.rfid_uid){
         profiles = fetch_all_profiles()
         for profile in profiles:
             if(rfid_uid == profile[1]):
+                logged_in = True
                 vars.rfid_uid = rfid_id
                 vars.user_authenticated = True
+                vars.user_id = profile[0]
                 vars.temp_threshold = profile[2]
                 vars.light_threshold = profile[3]
+    }
+    if(logged_in == False){
+        vars.user_valid = False
     }
 
 if __name__ == "__main__":

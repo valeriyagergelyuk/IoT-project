@@ -59,7 +59,9 @@ light_value = 0
 #for rfid 
 rfid_uid = ""
 user_authenticated = False
+user_valid = True
 
 #user thresholds (values set by default)
+user_id = 0
 temp_threshold = 24
 light_threshold = 400
