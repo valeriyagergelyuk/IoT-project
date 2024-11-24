@@ -46,3 +46,11 @@ function getEmailLightData()
         console.log(data);
     });
 }
+
+function getUserData(){
+    fetch('/get_user_profile')
+    .then(response => response.json())
+    .then(data => {
+        
+    });
+}
