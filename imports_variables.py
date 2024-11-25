@@ -60,6 +60,8 @@ light_value = 0
 rfid_uid = ""
 user_authenticated = False
 user_valid = True
+email_user_auth = False
+user_changed = False
 
 #user thresholds (values set by default)
 user_id = 0

@@ -2,6 +2,7 @@ from imports_variables import *
 import imports_variables as vars
 import emailTemperature as dht_motor
 import emailLight as light_sensor
+import emailUserRfid as rfid_scanner
 
 app = Flask(__name__)
 
@@ -52,6 +53,7 @@ def returnUserProfileValues():
 if __name__ == "__main__":
     threading.Thread(target=dht_motor.loop, daemon=True).start()
     threading.Thread(target=light_sensor.loop, daemon=True).start()
+    threading.Thread(target=rfid_scanner.loop, daemon=True).start()
     app.run(host='0.0.0.0', port=5000) 
 
     

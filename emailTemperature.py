@@ -28,7 +28,7 @@ def capture_email(date_email_sent):
     yes_mail_received = False
 
     # Allows the probing to work while waiting for email
-    if not dht_is_running:
+    if not vars.dht_is_running:
         dht_is_running = True
         dht_thread = threading.Thread(target=dht_loop, daemon=True)
         dht_thread.start()

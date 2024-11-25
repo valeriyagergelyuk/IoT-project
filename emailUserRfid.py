@@ -1,5 +1,6 @@
 from imports_variables import *
 import imports_variables as vars
+import verify_db as our_db
 
 def send_email():
     current_time = datetime.now()
@@ -26,3 +27,18 @@ def send_email():
         print(f"Error sending email: {e}")
 
 def loop():
+    email_user_auth, rfid_uid
+    while True:
+        msg = subscribe.simple("IoTlab/RFID", hostname="192.168.167.140")
+        print("%s %s" % (msg.topic, msg.payload))
+
+        tag_value = int(msg.payload.decode('utf-8'))
+
+        if((our_db.check_user_rfid(vars.rfid_uid) and vars.email_user_auth == False) and vars.user_changed == True):
+           send_email()
+           vars.email_user_auth = True
+           vars.user_changed = False
+        else:
+        # elif(our_db.check_user_rfid(vars.rfid_uid) == False and vars.email_user_auth == False):
+            vars.email_user_auth = False
+        time.sleep(1)
