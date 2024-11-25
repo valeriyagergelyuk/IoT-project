@@ -39,10 +39,10 @@ def returnCurrentDhtRelatedValues():
 
 @app.route('/get_email_and_light_data')
 def returnCurrentLightingRelatedValues():
-    global email_sent
-    global light_value
-    global email_body
-    data = {'Light Amount': light_value, "isEmailSent": email_sent, "emailBody": email_body}
+    # global email_sent
+    # global light_value
+    # global email_body
+    data = {'Light Amount': vars.light_value, "isEmailSent": vars.email_sent, "emailBody": vars.email_body}
     return jsonify(data)
 
 @app.route('/get_user_profile')

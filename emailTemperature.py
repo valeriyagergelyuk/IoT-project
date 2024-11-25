@@ -24,12 +24,12 @@ def send_email():
         print(f"Error sending email: {e}")
 
 def capture_email(date_email_sent):
-    global dht_is_running
+    # global dht_is_running
     yes_mail_received = False
 
     # Allows the probing to work while waiting for email
     if not vars.dht_is_running:
-        dht_is_running = True
+        vars.dht_is_running = True
         dht_thread = threading.Thread(target=dht_loop, daemon=True)
         dht_thread.start()
 
@@ -93,7 +93,7 @@ def capture_email(date_email_sent):
                 if(yes_mail_received == True):
                     break
     # Stops the thread
-    dht_is_running = False
+    vars.dht_is_running = False
         
         ## Now the email will wait for a yes always, but if user says no, it won't resend if it dropps down to below 24,
         ## then comes back up uptill the user says yes, should that be changed?
@@ -105,7 +105,7 @@ def capture_email(date_email_sent):
 def dht_loop():
     global sumCnt, okCnt
 
-    while dht_is_running:
+    while vars.dht_is_running:
         sumCnt += 1
         chk = dht.readDHT11()   
         if chk == 0:
