@@ -83,7 +83,8 @@ string checkRfid(){
   // get UID
   String card_uid = "";
   for (byte i = 0; i < rfid.uid.size; i++) {
-    card_uid += rfid.uid.uidByte[i];
+    // card_uid += rfid.uid.uidByte[i];
+    card_uid += String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ")  + String(rfid.uid.uidByte[i], HEX);
   }
   // Halt PICC
   rfid.PICC_HaltA();
