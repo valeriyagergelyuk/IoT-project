@@ -32,7 +32,7 @@ def loop():
         msg = subscribe.simple("IoTlab/RFID", hostname="192.168.167.140")
         print("%s %s" % (msg.topic, msg.payload))
 
-        tag_value = int(msg.payload.decode('utf-8'))
+        tag_value = msg.payload.decode('utf-8')
 
         if((our_db.check_user_rfid(vars.rfid_uid) and vars.email_user_auth == False) and vars.user_changed == True):
            send_email()

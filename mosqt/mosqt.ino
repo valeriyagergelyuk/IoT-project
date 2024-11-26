@@ -1,47 +1,45 @@
+
 //This is for esp
 #include <WiFi.h>
 #include <DHT.h>
 #include <PubSubClient.h>
-//for rfid
 #include <SPI.h>
 #include <MFRC522.h>
 
-// Replace the next variables with your SSID/Password combination
 const char* ssid = "Crackers";
 const char* password = "ChrisDuck";
-// Add your MQTT Broker IP address, example:
 const char* mqtt_server = "192.168.167.140";
+
 WiFiClient espClient;
 PubSubClient client(espClient);
-long lastMsg = 0;
-char msg[50];
-int value = 0;
+
 int islightReallyTrue = 0;
 int islightReallyFalse = 0;
-// LED Pin
+// Led Pin
 const int ledPin = 5;
-const int photoResistorPin = 39;
-
-//RFID pins
-#define SS_PIN 17 // SDA Pin on RC522
-#define RST_PIN 4 // RST Pin on RC522
-
+// PhotoResistor Pin
+const int photoResistorPin = 39;  //VN
+// RFID pins
+#define SS_PIN 17  // SDA Pin
+#define RST_PIN 4  // RST Pin
 MFRC522 rfid(SS_PIN, RST_PIN);
-
-
-#define DHTPIN 18
-
+// DHT pin
+#define DHTPIN 16
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
+
 void setup() {
   Serial.begin(115200);
+  // WIFI
   setup_wifi();
-
-  SPI.begin(); 
-  rfid.PCD_Init(); 
+  // RFID
+  SPI.begin();
+  rfid.PCD_Init();
+  // DHT
   dht.begin();
-  
+  // MQTT
   client.setServer(mqtt_server, 1883);
+  // LED
   pinMode(ledPin, OUTPUT);
 }
 
@@ -67,7 +65,6 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("vanieriot")) {
       Serial.println("connected");
-      //client.subscribe("room/light");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -77,7 +74,7 @@ void reconnect() {
   }
 }
 
-String checkRfid(){
+String checkRfid() {
   // Look for new cards
   if (!rfid.PICC_IsNewCardPresent()) {
     return "none";
@@ -87,14 +84,17 @@ String checkRfid(){
   if (!rfid.PICC_ReadCardSerial()) {
     return "none";
   }
+
   // get UID
   String card_uid = "";
+  Serial.print("Card UID:");
   for (byte i = 0; i < rfid.uid.size; i++) {
     // card_uid += rfid.uid.uidByte[i];
-    card_uid += String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ")  + String(rfid.uid.uidByte[i], HEX);
+    card_uid += String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ") + String(rfid.uid.uidByte[i], HEX);
   }
   // Halt PICC
   rfid.PICC_HaltA();
+  Serial.println(card_uid);
   return card_uid;
 }
 
@@ -106,16 +106,23 @@ void loop() {
   if (!client.loop()) {
     client.connect("vanieriot");
   }
+
   String resultTemp = dhtHandlerTemp();
   String resultHum = dhtHandlerHum();
+  String tag_id = checkRfid();
+
   client.publish("IoTlab/dht11/hum", resultHum.c_str());
   client.publish("IoTlab/dht11/temp", resultTemp.c_str());
+  client.publish("IoTlab/RFID", tag_id.c_str());
+
+  lightSensor();
+    delay(1000);
+}
+
+void lightSensor() {
   int lightValue = analogRead(photoResistorPin);
   String lightValueStr = String(lightValue);
 
-  String tag_id = checkRfid();
-  //client.publish("IoTlab/RFID", tag_id); 
-  
   if (atoi(lightValueStr.c_str()) <= 400) {
     islightReallyFalse = 0;
     islightReallyTrue++;
@@ -145,15 +152,13 @@ void loop() {
       Serial.println(lightValueStr.c_str());
     }
   }
-  delay(1000);
 }
 
 String dhtHandlerTemp() {
   float t = dht.readTemperature();
-  //   if (isnan(h) || isnan(t)) {
-  //   Serial.println(F("Failed to read from DHT sensor!"));
-  //   return;
-  // }
+  if (isnan(t)) {
+    return "";
+  }
   Serial.print(F("%  Temperature: "));
   Serial.print(t);
   Serial.print(F("°C "));
@@ -162,10 +167,9 @@ String dhtHandlerTemp() {
 
 String dhtHandlerHum() {
   float h = dht.readHumidity();
-  //   if (isnan(h) || isnan(t)) {
-  //   Serial.println(F("Failed to read from DHT sensor!"));
-  //   return;
-  // }
+  if (isnan(h)) {
+    return "";
+  }
   Serial.print(F("Humidity: "));
   Serial.print(h);
   return String(h);
