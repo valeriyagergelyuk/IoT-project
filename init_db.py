@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS UserProfiles (
 # Add a sample user
 cursor.execute('''
 INSERT OR IGNORE INTO UserProfiles (userID, rfidTag)
-VALUES ('user1', '33a2130e')
+VALUES ('user1', '737a980e')
 ''')
 
 # Commit changes and close

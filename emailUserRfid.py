@@ -62,17 +62,16 @@ def loop():
     """
     Main loop for reading RFID tags, checking database, and sending email if necessary.
     """
-    global rfid_uid, user_authenticated, user_valid, temp_threshold, light_threshold, user_id
 
     while threads_active:
-        msg = subscribe.simple("IoTlab/RFID", hostname="192.168.1.161")
+        msg = subscribe.simple("IoTlab/RFID", hostname = vars.hostname)
         print(f"MQTT Message Received - Topic: {msg.topic}, Payload: {msg.payload}")
 
         tag_value = msg.payload.decode('utf-8')
 
         if tag_value:
             print(f"Scanned RFID Tag: {tag_value}")
-            rfid_uid = tag_value
+            vars.rfid_uid = tag_value
 
             try:
                 conn = sqlite3.connect('iot_project.db')
@@ -81,22 +80,22 @@ def loop():
                 result = cursor.fetchone()
 
                 if result:
-                    user_id, temp_threshold, light_threshold = result
-                    user_authenticated = True
-                    user_valid = True
+                    vars.user_id, vars.temp_threshold, vars.light_threshold = result
+                    vars.user_authenticated = True
+                    vars.user_valid = True
                     vars.user_changed = True  # Indicate user context has changed
-                    print(f"User authenticated: ID={user_id}, Temp Threshold={temp_threshold}, Light Threshold={light_threshold}")
+                    print(f"User authenticated: ID={vars.user_id}, Temp Threshold={vars.temp_threshold}, Light Threshold={vars.light_threshold}")
 
                     if vars.email_user_auth is False and vars.user_changed:
                         send_email()
 
                     # Update thresholds with the current sensor values (from MQTT or sensors)
                     print(f"Updating thresholds with current values: Temp={vars.temp}, Light={vars.light}")
-                    update_thresholds(user_id, vars.temp, vars.light)
+                    update_thresholds(vars.user_id, vars.temp, vars.light)
 
                 else:
-                    user_authenticated = False
-                    user_valid = False
+                    vars.user_authenticated = False
+                    vars.user_valid = False
                     vars.user_changed = False
                     print("Invalid RFID tag or user not registered.")
 

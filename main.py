@@ -75,7 +75,11 @@ def return_current_lighting_values():
     data = {'LightAmount': vars.light_value, "isEmailSent": vars.email_sent, "emailBody": vars.email_body}
     return jsonify(data)
 
-
+@app.route('/get_user')
+def return_current_user_with_data():
+    data = {'userID': vars.user_id, "userRFID": vars.rfid_uid, "isUserLoggedIn": vars.user_authenticated, "userTempThresh": vars.temp_threshold, "userLightThresh": vars.light_threshold}
+    return jsonify(data)
+    
 # @app.route('/get_user_profile', methods=['GET'])
 # def get_user_profile():
 #     global user_id, rfid_uid, user_authenticated, temp_threshold, light_threshold

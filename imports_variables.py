@@ -43,6 +43,7 @@ sender_password = "ucgu qkwh ltab zapt" # in App password
 recipient_email = "giannouleaschris@gmail.com"
 email_sent = False
 email_body = ""
+hostname="192.168.167.140"
 
 #For Motor
 Motor1 = 22  # Enable Pin

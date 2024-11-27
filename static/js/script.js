@@ -48,7 +48,7 @@ function getEmailLightData()
 }
 
 function getUserData(){
-    fetch('/get_user_profile')
+    fetch('/get_user')
     .then(response => response.json())
     .then(data => {
         // if(data["isUserLoggedIn"]){
@@ -61,5 +61,7 @@ function getUserData(){
         document.getElementById("rfidTag").innerText = "RFID tag ID: " + data["userRFID"];
         document.getElementById("lightLevel").innerText = "Minimum Light Level: " + data["userLightThresh"];
         document.getElementById("tempLevel").innerText = "Maximum Temperature: " + data["userTempThresh"] + " C";
+        console.log(data);
     });
+
 }
