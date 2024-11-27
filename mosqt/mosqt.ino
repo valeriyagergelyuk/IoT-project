@@ -6,9 +6,9 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-const char* ssid = "Crackers";
-const char* password = "ChrisDuck";
-const char* mqtt_server = "192.168.167.140";
+const char* ssid = "AMANANET_016";
+const char* password = "68557461";
+const char* mqtt_server = "192.168.1.161";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -87,10 +87,11 @@ String checkRfid() {
 
   // get UID
   String card_uid = "";
-  Serial.print("Card UID:");
   for (byte i = 0; i < rfid.uid.size; i++) {
-    // card_uid += rfid.uid.uidByte[i];
-    card_uid += String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ") + String(rfid.uid.uidByte[i], HEX);
+    if (rfid.uid.uidByte[i] < 0x10) {
+      card_uid += "0"; // Add leading zero for single-digit bytes
+    }
+    card_uid += String(rfid.uid.uidByte[i], HEX);
   }
   // Halt PICC
   rfid.PICC_HaltA();
