@@ -1,7 +1,8 @@
 function changeFanImages(emailResult) {
     if(emailResult == true) {
         // document.getElementById('lightSwitch').src='../static/images/offSwitch.jpg';
-         document.getElementById('fanState').src='../static/images/fanOn.jpg';
+        document.getElementById('fanState').src='../static/images/fanturn.png';
+        //document.getElementById('fanState').style.transform='rotate(20deg)';
     } 
     else 
     {

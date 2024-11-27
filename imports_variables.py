@@ -70,3 +70,6 @@ light_threshold = 400
 temp = 0.0
 hum = 0.0
 light = 0.0 
+#setting initial variables high to not change whenever a user is not logged in
+temp_threshold = 100
+light_threshold = 6000
