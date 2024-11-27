@@ -65,5 +65,6 @@ user_changed = False
 
 #user thresholds (values set by default)
 user_id = 0
-temp_threshold = 24
-light_threshold = 400
+#setting initial variables high to not change whenever a user is not logged in
+temp_threshold = 100
+light_threshold = 6000

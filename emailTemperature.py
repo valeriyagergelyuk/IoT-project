@@ -151,9 +151,14 @@ def loop():
 
         # Check temperature and send email if necessary
         if vars.temp > vars.temp_threshold and not email_sent:
+            # print("works")
             send_email() 
             email_sent = True  # Set flag to indicate email has been sent
         elif vars.temp <= 22:
             email_sent = False  # Reset the flag if temperature goes below 24
             toggle_motor('off')
+
+        # if vars.temp > vars.temp_threshold:
+        #     vars.fan_on = True
+        #     print("temp is " + vars.temp + " " + vars.fan_on)
         time.sleep(3)
