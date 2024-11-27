@@ -65,6 +65,7 @@ def toggle_led():
 
 @app.route('/get_temp_data')
 def return_current_dht_values():
+    print(vars.fan_on)
     data = {'IsFanMeantToBeOn': vars.fan_on, "Temperature": vars.temp, "Humidity": vars.hum}
     return jsonify(data)
 

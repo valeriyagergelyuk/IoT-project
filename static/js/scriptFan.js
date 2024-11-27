@@ -7,7 +7,7 @@ function changeFanImages(emailResult) {
     else 
     {
         // document.getElementById('lightSwitch').src='../static/images/onSwitch.jpg';
-        document.getElementById('fanState').src='../static/images/fanOff.jpg';
+        document.getElementById('fanState').src='../static/images/fanMove.png';
     }
 }
 
