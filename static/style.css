@@ -124,6 +124,10 @@
     padding: 40px;
 }
 
+#img_avatar{
+    padding: 40px;
+}
+
 #temp, #hum{
     width:100px; height:100px;
     display: inline-block;
