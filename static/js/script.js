@@ -51,9 +51,9 @@ function getUserData(){
     fetch('/get_user_profile')
     .then(response => response.json())
     .then(data => {
-        if(data["isUserLoggedIn"]){
-            document.getElementById("loggedIn").innerText = "A new user has logged in";
-        }
+        // if(data["isUserLoggedIn"]){
+        //     document.getElementById("loggedIn").innerText = "A new user has logged in";
+        // }
         if(data["isLoginFailed"]){
             document.getElementById("loggedIn").innerText = "Login failed";
         }

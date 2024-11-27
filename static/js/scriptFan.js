@@ -1,13 +1,12 @@
 function changeFanImages(emailResult) {
     if(emailResult == true) {
         // document.getElementById('lightSwitch').src='../static/images/offSwitch.jpg';
-        document.getElementById('fanState').src='../static/images/fanturn.png';
-        //document.getElementById('fanState').style.transform='rotate(20deg)';
+        document.getElementById('fanState').src='../static/images/fanMove.png';
     } 
     else 
     {
         // document.getElementById('lightSwitch').src='../static/images/onSwitch.jpg';
-        document.getElementById('fanState').src='../static/images/fanOff.jpg';
+        document.getElementById('fanState').src='../static/images/fanturn.png';
     }
 }
 
