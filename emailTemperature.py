@@ -116,9 +116,9 @@ def dht_loop():
         #vars.hum = random.randint(50,60) #dht.getHumidity()
         #vars.temp = random.randint(19,24)#dht.getTemperature()
 
-        msgTemp = subscribe.simple("IoTlab/dht11/temp", hostname="192.168.167.140")
+        msgTemp = subscribe.simple("IoTlab/dht11/temp", hostname="192.168.1.161")
         print("%s %s" % (msgTemp.topic, msgTemp.payload))
-        msgHum = subscribe.simple("IoTlab/dht11/hum", hostname="192.168.167.140")
+        msgHum = subscribe.simple("IoTlab/dht11/hum", hostname="192.168.1.161")
         print("%s %s" % (msgHum.topic, msgHum.payload))
         
         if len(msgTemp.payload):
@@ -151,8 +151,8 @@ def loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        msgTemp = subscribe.simple("IoTlab/dht11/temp", hostname="192.168.167.140")
-        msgHum = subscribe.simple("IoTlab/dht11/hum", hostname="192.168.167.140")
+        msgTemp = subscribe.simple("IoTlab/dht11/temp", hostname="192.168.1.161")
+        msgHum = subscribe.simple("IoTlab/dht11/hum", hostname="192.168.1.161")
 
         if len(msgTemp.payload):
             vars.hum = float(msgHum.payload.decode('utf-8'))

@@ -27,8 +27,8 @@ def send_email():
 def loop():
     while True:
         # msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.167.140")
-        msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.167.140")
-        msgrf = subscribe.simple("IoTlab/RFID", hostname="192.168.167.140")
+        msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.1.161")
+        msgrf = subscribe.simple("IoTlab/RFID", hostname="192.168.1.161")
         print("%s %s" % (msg.topic, msg.payload))
         print("%s %s" % (msgrf.topic, msgrf.payload))
 

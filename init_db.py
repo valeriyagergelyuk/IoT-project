@@ -1,29 +1,26 @@
 import sqlite3
 
-def initialize_database():
-    conn = sqlite3.connect('iot_project.db')
-    cursor = conn.cursor()
+# Create and initialize the database
+conn = sqlite3.connect('iot_project.db')
+cursor = conn.cursor()
 
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS UserProfiles (
-            UserID INTEGER PRIMARY KEY AUTOINCREMENT,
-            RFIDTagNumber TEXT NOT NULL UNIQUE,
-            TemperatureThreshold REAL NOT NULL,
-            LightIntensityThreshold REAL NOT NULL
-        )
-    ''')
+# Create table with default thresholds
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS UserProfiles (
+    userID TEXT PRIMARY KEY,
+    rfidTag TEXT UNIQUE,
+    tempThreshold REAL DEFAULT 25,
+    lightThreshold REAL DEFAULT 400
+)
+''')
 
-    cursor.execute('''
-        INSERT INTO UserProfiles (RFIDTagNumber, TemperatureThreshold, LightIntensityThreshold)
-        VALUES 
-        ('33 A2 13 0E', 25.0, 300.0),
-        ('12 B3 45 6F', 22.5, 350.0),
-        ('89 D4 56 7A', 28.0, 400.0)
-    ''')
+# Add a sample user
+cursor.execute('''
+INSERT OR IGNORE INTO UserProfiles (userID, rfidTag)
+VALUES ('user1', '33a2130e')
+''')
 
-    conn.commit()
-    conn.close()
-    print("New database initialized successfully with the updated schema!")
-
-if __name__ == "__main__":
-    initialize_database()
+# Commit changes and close
+conn.commit()
+conn.close()
+print("Database setup complete!")

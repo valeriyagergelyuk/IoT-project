@@ -67,3 +67,6 @@ user_changed = False
 user_id = 0
 temp_threshold = 24
 light_threshold = 400
+temp = 0.0
+hum = 0.0
+light = 0.0 

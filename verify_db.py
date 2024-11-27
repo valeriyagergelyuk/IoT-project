@@ -17,26 +17,26 @@ def fetch_all_profiles():
 
 def check_user_rfid(rfid_id):
     logged_in = False
-    if(rfid_id != vars.rfid_uid):
-        profiles = fetch_all_profiles()
-        for profile in profiles:
-            if(rfid_uid == profile[1]):
-                logged_in = True
-                vars.rfid_uid = rfid_id
-                vars.user_authenticated = True
-                vars.user_id = profile[0]
-                vars.temp_threshold = profile[2]
-                vars.light_threshold = profile[3]
-                vars.user_changed = True
-                vars.email_user_auth = False
-                return True
-    else:
+    conn = sqlite3.connect('iot_project.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM UserProfiles WHERE rfidTag = ?', (rfid_id,))
+    profile = cursor.fetchone()
+
+    if profile:
         logged_in = True
-        return True
-    
-    if(logged_in == False):
+        vars.rfid_uid = rfid_id
+        vars.user_authenticated = True
+        vars.user_id = profile[0]
+        vars.temp_threshold = profile[2]
+        vars.light_threshold = profile[3]
+        vars.user_changed = True
+        vars.email_user_auth = False
+    else:
         vars.user_valid = False
-        return False
+
+    conn.close()
+    return logged_in
+
     
 
 if __name__ == "__main__":
