@@ -113,8 +113,17 @@ def dht_loop():
         
         okRate = 100.0 * okCnt / sumCnt
         # Update humidity and temperature for the web server
-        vars.hum = random.randint(50,60) #dht.getHumidity()
-        vars.temp = random.randint(19,24)#dht.getTemperature()
+        #vars.hum = random.randint(50,60) #dht.getHumidity()
+        #vars.temp = random.randint(19,24)#dht.getTemperature()
+
+        msgTemp = subscribe.simple("IoTlab/dht11/temp", hostname="192.168.167.140")
+        print("%s %s" % (msgTemp.topic, msgTemp.payload))
+        msgHum = subscribe.simple("IoTlab/dht11/hum", hostname="192.168.167.140")
+        print("%s %s" % (msgHum.topic, msgHum.payload))
+        
+        if len(msgTemp.payload):
+            vars.hum = float(msgHum.payload.decode('utf-8'))
+            vars.temp = float(msgTemp.payload.decode('utf-8'))
         
         print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
         print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk, vars.hum, vars.temp))
@@ -142,9 +151,12 @@ def loop():
             okCnt += 1      
         
         okRate = 100.0 * okCnt / sumCnt
-        # Update humidity and temperature for the web server
-        vars.hum = random.randint(50,60) #dht.getHumidity()
-        vars.temp = random.randint(19,24)#dht.getTemperature()
+        msgTemp = subscribe.simple("IoTlab/dht11/temp", hostname="192.168.167.140")
+        msgHum = subscribe.simple("IoTlab/dht11/hum", hostname="192.168.167.140")
+
+        if len(msgTemp.payload):
+            vars.hum = float(msgHum.payload.decode('utf-8'))
+            vars.temp = float(msgTemp.payload.decode('utf-8'))
 
         print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
         print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,vars.hum , vars.temp))

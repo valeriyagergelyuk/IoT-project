@@ -25,17 +25,18 @@ def send_email():
         print(f"Error sending email: {e}")
 
 def loop():
-    global email_sent, light_value
     while True:
         # msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.167.140")
         msg = subscribe.simple("IoTlab/EPS32", hostname="192.168.167.140")
+        msgrf = subscribe.simple("IoTlab/RFID", hostname="192.168.167.140")
         print("%s %s" % (msg.topic, msg.payload))
+        print("%s %s" % (msgrf.topic, msgrf.payload))
 
-        light_value = int(msg.payload.decode('utf-8'))
+        vars.light_value = int(msg.payload.decode('utf-8'))
 
-        if(light_value <= vars.light_threshold and not email_sent):
+        if(vars.light_value <= vars.light_threshold and not vars.email_sent):
            send_email()
-           email_sent = True
-        elif(light_value > 400):
-            email_sent = False
+           vars.email_sent = True
+        elif(vars.light_value > 400):
+            vars.email_sent = False
         time.sleep(1)
