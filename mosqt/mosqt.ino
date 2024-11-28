@@ -1,4 +1,3 @@
-
 //This is for esp
 #include <WiFi.h>
 #include <DHT.h>
@@ -6,9 +5,13 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-const char* ssid = "AMANANET_016";
-const char* password = "68557461";
-const char* mqtt_server = "192.168.1.161";
+const char* ssid = "Crackers";
+const char* password = "ChrisDuck";
+const char* mqtt_server = "192.168.167.140";
+long lastMsg = 0;
+char msg[50];
+int value = 0;
+int lightThreashold = 400;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -39,6 +42,7 @@ void setup() {
   dht.begin();
   // MQTT
   client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
   // LED
   pinMode(ledPin, OUTPUT);
 }
@@ -89,7 +93,7 @@ String checkRfid() {
   String card_uid = "";
   for (byte i = 0; i < rfid.uid.size; i++) {
     if (rfid.uid.uidByte[i] < 0x10) {
-      card_uid += "0"; // Add leading zero for single-digit bytes
+      card_uid += "0";
     }
     card_uid += String(rfid.uid.uidByte[i], HEX);
   }
@@ -111,20 +115,34 @@ void loop() {
   String resultTemp = dhtHandlerTemp();
   String resultHum = dhtHandlerHum();
   String tag_id = checkRfid();
-
+  client.subscribe("IoTlab/lightChange");
   client.publish("IoTlab/dht11/hum", resultHum.c_str());
   client.publish("IoTlab/dht11/temp", resultTemp.c_str());
   client.publish("IoTlab/RFID", tag_id.c_str());
 
   lightSensor();
-    delay(1000);
+  delay(1000);
+}
+
+void callback(String topic, byte* message, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.print(topic);
+  Serial.print(". Message: ");
+  String messagein;
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)message[i]);
+    messagein += (char)message[i];
+  }
+    Serial.println(messagein);
+    lightThreashold = atoi(messagein.c_str());
 }
 
 void lightSensor() {
   int lightValue = analogRead(photoResistorPin);
   String lightValueStr = String(lightValue);
-
-  if (atoi(lightValueStr.c_str()) <= 400) {
+  Serial.println("ASDASD:");
+  Serial.print(lightThreashold);
+  if (atoi(lightValueStr.c_str()) <= lightThreashold) {
     islightReallyFalse = 0;
     islightReallyTrue++;
     Serial.println("Light On: " + String(islightReallyTrue));

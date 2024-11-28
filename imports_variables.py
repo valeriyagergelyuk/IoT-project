@@ -14,8 +14,10 @@ from email.parser import BytesParser
 import atexit
 # Test Sake
 import random
-
+import verify_db as our_db
 import paho.mqtt.subscribe as subscribe
+import paho.mqtt.publish as publish
+import sqlite3
 
 # For LED
 LED_PIN = 19
@@ -43,7 +45,8 @@ sender_password = "ucgu qkwh ltab zapt" # in App password
 recipient_email = "giannouleaschris@gmail.com"
 email_sent = False
 email_body = ""
-hostname="192.168.1.161"
+hostname="192.168.167.140"
+#hostname="192.168.1.161"
 
 #For Motor
 Motor1 = 22  # Enable Pin

@@ -1,18 +1,7 @@
 from imports_variables import *
 import imports_variables as vars
-import verify_db as our_db
-import time
-import smtplib
-from datetime import datetime
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import paho.mqtt.subscribe as subscribe
-import sqlite3
 
 def send_email():
-    """
-    Function to send an email notification when a user enters.
-    """
     current_time = datetime.now()
     formatted_time = current_time.strftime("%H:%M")
     subject = "User Entered"
@@ -35,10 +24,7 @@ def send_email():
     except Exception as e:
         print(f"Error sending email: {e}")
 
-def update_thresholds(user_id, temp_threshold, light_threshold):
-    """
-    Function to update the temperature and light threshold values for an authenticated user in the database.
-    """
+def update_thresholds():
     try:
         conn = sqlite3.connect('iot_project.db')
         cursor = conn.cursor()
@@ -48,10 +34,10 @@ def update_thresholds(user_id, temp_threshold, light_threshold):
             SET tempThreshold = ?, lightThreshold = ?
             WHERE userID = ?;
         """
-        cursor.execute(update_query, (temp_threshold, light_threshold, user_id))
+        cursor.execute(update_query, (vars.temp_threshold, vars.light_threshold, vars.user_id))
         
         conn.commit()
-        print(f"Updated thresholds for User ID {user_id}: Temp Threshold={temp_threshold}, Light Threshold={light_threshold}")
+        print(f"Updated thresholds for User ID {vars.user_id}: Temp Threshold={vars.temp_threshold}, Light Threshold={vars.light_threshold}")
         
     except sqlite3.Error as e:
         print(f"Error updating database: {e}")
@@ -59,14 +45,9 @@ def update_thresholds(user_id, temp_threshold, light_threshold):
         conn.close()
 
 def loop():
-    """
-    Main loop for reading RFID tags, checking database, and sending email if necessary.
-    """
-
     while threads_active:
         msg = subscribe.simple("IoTlab/RFID", hostname = vars.hostname)
         print(f"MQTT Message Received - Topic: {msg.topic}, Payload: {msg.payload}")
-
         tag_value = msg.payload.decode('utf-8')
 
         if tag_value:
@@ -91,8 +72,9 @@ def loop():
                         send_email()
 
                     # Update thresholds with the current sensor values (from MQTT or sensors)
-                    print(f"Updating thresholds with current values: Temp={vars.temp}, Light={vars.light}")
-                    update_thresholds(vars.user_id, vars.temp, vars.light)
+                    print(f"Updating thresholds with current values: Temp={vars.temp_threshold}, Light={vars.light_threshold}")
+                    update_thresholds()
+                    publish.single("IoTlab/lightChange", payload=vars.light_threshold, hostname=vars.hostname)
 
                 else:
                     vars.user_authenticated = False
