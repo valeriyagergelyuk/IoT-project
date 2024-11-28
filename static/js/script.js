@@ -56,6 +56,8 @@ function getUserData(){
         // }
         if(!data["isUserLoggedIn"]){
             document.getElementById("loggedIn").innerText = "Login failed";
+        }else{
+            document.getElementById("loggedIn").innerText = "";
         }
         document.getElementById("profileId").innerText = "Profile ID: " + data["userID"];
         document.getElementById("rfidTag").innerText = "RFID tag ID: " + data["userRFID"];
