@@ -14,13 +14,20 @@ CREATE TABLE IF NOT EXISTS UserProfiles (
 )
 ''')
 
-# Add a sample user
-cursor.execute('''
-INSERT OR IGNORE INTO UserProfiles (userID, rfidTag)
-VALUES ('user1', '737a980e')
-''')
+# Add users with RFID tags
+users = [
+    ('user1', '33a2130e'),
+    ('user2', '1358daf7'),
+    ('user3', '737a980e')
+]
+
+for userID, rfidTag in users:
+    cursor.execute('''
+    INSERT OR IGNORE INTO UserProfiles (userID, rfidTag)
+    VALUES (?, ?)
+    ''', (userID, rfidTag))
 
 # Commit changes and close
 conn.commit()
 conn.close()
-print("Database setup complete!")
+print("Users added and database setup complete!")
