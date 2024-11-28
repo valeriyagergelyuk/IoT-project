@@ -81,7 +81,6 @@ def loop():
 
                 if result:
                     vars.user_id, vars.temp_threshold, vars.light_threshold = result
-                    vars.rfid_id = tag_value
                     vars.user_authenticated = True
                     vars.user_valid = True
                     vars.user_changed = True  # Indicate user context has changed
