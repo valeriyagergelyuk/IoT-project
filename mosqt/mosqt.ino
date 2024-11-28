@@ -5,9 +5,9 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-const char* ssid = "Crackers";
-const char* password = "ChrisDuck";
-const char* mqtt_server = "192.168.167.140";
+const char* ssid = "AMANANET_016";
+const char* password = "68557461";
+const char* mqtt_server = "192.168.1.161";
 long lastMsg = 0;
 char msg[50];
 int value = 0;
@@ -49,7 +49,6 @@ void setup() {
 
 void setup_wifi() {
   delay(10);
-  // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -79,17 +78,14 @@ void reconnect() {
 }
 
 String checkRfid() {
-  // Look for new cards
   if (!rfid.PICC_IsNewCardPresent()) {
     return "none";
   }
 
-  // Select one of the cards
   if (!rfid.PICC_ReadCardSerial()) {
     return "none";
   }
 
-  // get UID
   String card_uid = "";
   for (byte i = 0; i < rfid.uid.size; i++) {
     if (rfid.uid.uidByte[i] < 0x10) {
@@ -97,7 +93,6 @@ String checkRfid() {
     }
     card_uid += String(rfid.uid.uidByte[i], HEX);
   }
-  // Halt PICC
   rfid.PICC_HaltA();
   Serial.println(card_uid);
   return card_uid;
@@ -115,14 +110,20 @@ void loop() {
   String resultTemp = dhtHandlerTemp();
   String resultHum = dhtHandlerHum();
   String tag_id = checkRfid();
+
+  // Only publish RFID data when a tag is scanned
+  if (tag_id != "none") {
+    client.publish("IoTlab/RFID", tag_id.c_str());
+  }
+
   client.subscribe("IoTlab/lightChange");
   client.publish("IoTlab/dht11/hum", resultHum.c_str());
   client.publish("IoTlab/dht11/temp", resultTemp.c_str());
-  client.publish("IoTlab/RFID", tag_id.c_str());
 
   lightSensor();
   delay(1000);
 }
+
 
 void callback(String topic, byte* message, unsigned int length) {
   Serial.print("Message arrived on topic: ");

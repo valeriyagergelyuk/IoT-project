@@ -51,27 +51,29 @@ function getUserData() {
     .then(response => response.json())
     .then(data => {
         if (!data["isUserLoggedIn"]) {
-            document.getElementById("loggedIn").innerText = "Please scan your card to login";
+            document.getElementById("loggedIn").innerText = "Please scan a valid card to login";
             document.getElementById("profileId").innerText = "Profile ID: Unknown";
+            document.getElementById("rfidTag").innerText = "RFID tag ID: Unknown"; // Display unknown if no user logged in
         } else {
             document.getElementById("loggedIn").innerText = "Logged in";
             document.getElementById("profileId").innerText = "Profile ID: " + data["userID"];
+            
+            // Only show the RFID tag if it's valid (not 'none' or null)
+            if (data["userRFID"] && data["userRFID"] !== "none") {
+                document.getElementById("rfidTag").innerText = "RFID tag ID: " + data["userRFID"];
+            } else {
+                document.getElementById("rfidTag").innerText = "RFID tag ID: Unknown"; // Hide RFID tag if it's invalid
+            }
+
+            document.getElementById("lightLevel").innerText = "Minimum Light Level: " + data["userLightThresh"];
+            document.getElementById("tempLevel").innerText = "Maximum Temperature: " + data["userTempThresh"] + " C";
         }
-        document.getElementById("rfidTag").innerText = "RFID tag ID: " + data["userRFID"];
-        document.getElementById("lightLevel").innerText = "Minimum Light Level: " + data["userLightThresh"];
-        document.getElementById("tempLevel").innerText = "Maximum Temperature: " + data["userTempThresh"] + " C";
         console.log(data);
     });
 }
 
-
 function onRFIDTagDetected(rfidTag) {
-    // If RFID is 'none' or null, don't log out or change the user, just keep the current user logged in
-    if (rfidTag === 'none' || rfidTag === null) {
-        return;  
-    }
-
-    if (rfidTag !== currentRFID) {
+if (rfidTag !== currentRFID) {
         currentRFID = rfidTag;
         fetch('/login_user', {
             method: 'POST',
@@ -82,7 +84,6 @@ function onRFIDTagDetected(rfidTag) {
         })
         .then(response => response.json())
         .then(data => {
-           
             getUserData();  
         });
     }
