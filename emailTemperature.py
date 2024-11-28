@@ -3,7 +3,7 @@ import imports_variables as vars
 
 def send_email():
     subject = "Temperature Alert"
-    body = "The temperature has exceeded 24 degrees Celsius. Would You like to turn on the fan? Reply with Yes to turn on the fan."
+    body = f"The temperature has exceeded {vars.temp_threshold} degrees Celsius. Would You like to turn on the fan? Reply with Yes to turn on the fan."
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -160,10 +160,9 @@ def loop():
 
         print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt, okRate))
         print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,vars.hum , vars.temp))
-
+        
         # Check temperature and send email if necessary
         if vars.temp > vars.temp_threshold and not email_sent:
-            # print("works")
             send_email() 
             email_sent = True  # Set flag to indicate email has been sent
         elif vars.temp <= vars.temp_threshold:

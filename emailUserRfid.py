@@ -45,12 +45,19 @@ def update_thresholds():
         conn.close()
 
 def loop():
+    tag_value = 'none'
+    old_tag_value = 'none'
     while threads_active:
+        publish.single("IoTlab/lightChange", payload=vars.light_threshold, hostname=vars.hostname)
         msg = subscribe.simple("IoTlab/RFID", hostname = vars.hostname)
         print(f"MQTT Message Received - Topic: {msg.topic}, Payload: {msg.payload}")
-        tag_value = msg.payload.decode('utf-8')
 
-        if tag_value:
+        if tag_value != 'none':
+            old_tag_value = tag_value
+        tag_value = msg.payload.decode('utf-8')
+        
+
+        if tag_value != 'none':
             print(f"Scanned RFID Tag: {tag_value}")
             vars.rfid_uid = tag_value
 
@@ -65,21 +72,21 @@ def loop():
                     vars.rfid = tag_value
                     vars.user_authenticated = True
                     vars.user_valid = True
-                    vars.user_changed = True  # Indicate user context has changed
+                    vars.user_changed = True  # Indicate user has changed
                     print(f"User authenticated: ID={vars.user_id}, Temp Threshold={vars.temp_threshold}, Light Threshold={vars.light_threshold}")
 
-                    if vars.email_user_auth is False and vars.user_changed:
+                    if old_tag_value != tag_value:
                         send_email()
+                        vars.email_user_auth = False
 
-                    # Update thresholds with the current sensor values (from MQTT or sensors)
+                    # Update thresholds with the current sensor values
                     print(f"Updating thresholds with current values: Temp={vars.temp_threshold}, Light={vars.light_threshold}")
                     update_thresholds()
-                    publish.single("IoTlab/lightChange", payload=vars.light_threshold, hostname=vars.hostname)
 
                 else:
-                    vars.user_authenticated = False
+                    # vars.user_authenticated = False
                     vars.user_valid = False
-                    vars.user_changed = False
+                    # vars.user_changed = False
                     print("Invalid RFID tag or user not registered.")
 
             except Exception as e:

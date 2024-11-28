@@ -46,7 +46,7 @@ recipient_email = "giannouleaschris@gmail.com"
 email_sent = False
 email_body = ""
 #hostname="192.168.167.140"
-hostname="192.168.1.161"
+hostname="192.168.167.140"
 
 #For Motor
 Motor1 = 22  # Enable Pin

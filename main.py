@@ -53,7 +53,7 @@ def return_current_lighting_values():
 
 @app.route('/get_user')
 def return_current_user_with_data():
-    data = {'userID': vars.user_id, "userRFID": vars.rfid_uid, "isUserLoggedIn": vars.user_authenticated, "userTempThresh": vars.temp_threshold, "userLightThresh": vars.light_threshold}
+    data = {'userID': vars.user_id, "userRFID": vars.rfid_uid, "isUserLoggedIn": vars.user_authenticated, "userTempThresh": vars.temp_threshold, "userLightThresh": vars.light_threshold, "correctUser": vars.user_valid}
     return jsonify(data)
     
 

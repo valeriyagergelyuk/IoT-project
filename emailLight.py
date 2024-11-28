@@ -27,7 +27,7 @@ def send_email():
 def loop():
     while True:
         msg = subscribe.simple("IoTlab/EPS32", hostname = vars.hostname)
-        msgrf = subscribe.simple("IoTlab/RFID", hostname = vars.hostname)
+        #msgrf = subscribe.simple("IoTlab/RFID", hostname = vars.hostname)
         #print("%s %s" % (msg.topic, msg.payload))
         #print("%s %s" % (msgrf.topic, msgrf.payload))
         vars.light_value = int(msg.payload.decode('utf-8'))

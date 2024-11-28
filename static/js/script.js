@@ -51,26 +51,47 @@ function getUserData() {
     .then(response => response.json())
     .then(data => {
         if (!data["isUserLoggedIn"]) {
-            document.getElementById("loggedIn").innerText = "Please scan a valid card to login";
-            document.getElementById("profileId").innerText = "Profile ID: Unknown";
-            document.getElementById("rfidTag").innerText = "RFID tag ID: Unknown"; // Display unknown if no user logged in
-        } else {
+            document.getElementById("loggedIn").style.display = "block";
+            document.getElementById("loggedIn").innerText = "Login";
+            document.getElementById("profileId").innerText = "Profile ID:\nN/A";
+            document.getElementById("rfidTag").innerText = "RFID tag ID:\nN/A";
+        } else if (!data["correctUser"]) {
+            document.getElementById("loggedIn").style.display = "block";
+            document.getElementById("loggedIn").innerText = "Unknown Tag";
+            setTimeout(function() {
+                document.getElementById("loggedIn").style.display = "none";
+            }, 3000);
+            
+        }else if (data["isUserLoggedIn"]) {
             document.getElementById("loggedIn").innerText = "Logged in";
             document.getElementById("profileId").innerText = "Profile ID: " + data["userID"];
+            document.getElementById("rfidTag").innerText = "RFID tag ID: " + data["userRFID"];
+            setTimeout(function() {
+                document.getElementById("loggedIn").style.display = "none";
+            }, 3000);
+        } 
+        document.getElementById("lightLevel").innerText = "Minimum Light Level: " + data["userLightThresh"];
+        document.getElementById("tempLevel").innerText = "Maximum Temperature: " + data["userTempThresh"] + " C";
+        //     document.getElementById("loggedIn").innerText = "Please scan a valid card to login";
+        //     document.getElementById("profileId").innerText = "Profile ID: Unknown";
+        //     document.getElementById("rfidTag").innerText = "RFID tag ID: Unknown"; // Display unknown if no user logged in
+        // } else {
+        //     document.getElementById("loggedIn").innerText = "Logged in";
+        //     document.getElementById("profileId").innerText = "Profile ID: " + data["userID"];
             
-            // Only show the RFID tag if it's valid (not 'none' or null)
-            if (data["userRFID"] && data["userRFID"] !== "none") {
-                document.getElementById("rfidTag").innerText = "RFID tag ID: " + data["userRFID"];
-            } else {
-                document.getElementById("rfidTag").innerText = "RFID tag ID: Unknown"; // Hide RFID tag if it's invalid
-            }
+        //     // Only show the RFID tag if it's valid (not 'none' or null)
+        //     if (data["userRFID"] && data["userRFID"] !== "none") {
+        //         document.getElementById("rfidTag").innerText = "RFID tag ID: " + data["userRFID"];
+        //     } else {
+        //         document.getElementById("rfidTag").innerText = "RFID tag ID: Unknown"; // Hide RFID tag if it's invalid
+        //     }
 
-            document.getElementById("lightLevel").innerText = "Minimum Light Level: " + data["userLightThresh"];
-            document.getElementById("tempLevel").innerText = "Maximum Temperature: " + data["userTempThresh"] + " C";
-        }
+        //     document.getElementById("lightLevel").innerText = "Minimum Light Level: " + data["userLightThresh"];
+        //     document.getElementById("tempLevel").innerText = "Maximum Temperature: " + data["userTempThresh"] + " C";
         console.log(data);
-    });
+    }); 
 }
+    
 
 function onRFIDTagDetected(rfidTag) {
 if (rfidTag !== currentRFID) {
