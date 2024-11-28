@@ -59,7 +59,7 @@ light_value = 0
 
 #for rfid 
 rfid_uid = ""
-user_authenticated = False
+user_authenticated = True
 user_valid = True
 email_user_auth = False
 user_changed = False

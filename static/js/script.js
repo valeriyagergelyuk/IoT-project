@@ -54,7 +54,7 @@ function getUserData(){
         // if(data["isUserLoggedIn"]){
         //     document.getElementById("loggedIn").innerText = "A new user has logged in";
         // }
-        if(data["isLoginFailed"]){
+        if(!data["isUserLoggedIn"]){
             document.getElementById("loggedIn").innerText = "Login failed";
         }
         document.getElementById("profileId").innerText = "Profile ID: " + data["userID"];
