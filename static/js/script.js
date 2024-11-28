@@ -1,9 +1,11 @@
+let currentRFID = null;
+
 function toggleLED() {
     let ledState;
-    if(document.getElementById('lightSwitch').getAttribute('src')=='../static/images/offSwitch.jpg'){
+    if (document.getElementById('lightSwitch').getAttribute('src') == '../static/images/offSwitch.jpg') {
         ledState = 'ON';
     }
-    if(document.getElementById('lightSwitch').getAttribute('src')=='../static/images/onSwitch.jpg'){
+    if (document.getElementById('lightSwitch').getAttribute('src') == '../static/images/onSwitch.jpg') {
         ledState = 'OFF';
     }
     changeLedImages(ledState);
@@ -18,52 +20,70 @@ function toggleLED() {
 }
 
 function changeLedImages(ledState) {
-     if(ledState === "OFF"){
-         document.getElementById('lightSwitch').src='../static/images/offSwitch.jpg';
-         document.getElementById('lightbulb').src='../static/images/lightOff.png';
-     }
-     else{
-         document.getElementById('lightSwitch').src='../static/images/onSwitch.jpg';
-         document.getElementById('lightbulb').src='../static/images/lightOn.png';
-     }
+    if (ledState === "OFF") {
+        document.getElementById('lightSwitch').src = '../static/images/offSwitch.jpg';
+        document.getElementById('lightbulb').src = '../static/images/lightOff.png';
+    } else {
+        document.getElementById('lightSwitch').src = '../static/images/onSwitch.jpg';
+        document.getElementById('lightbulb').src = '../static/images/lightOn.png';
+    }
 }
 
-function getEmailLightData()
-{
+function getEmailLightData() {
     fetch('/get_email_and_light_data')
     .then(response => response.json())
     .then(data => {
         document.getElementById("lightIntensity").innerText = "Light intensity: " + data["LightAmount"];
         document.getElementById("lightGauge").value = "" + data["LightAmount"];
         if (data["isEmailSent"]) {
-            document.getElementById('lightbulb').src='../static/images/lightOn.png';
+            document.getElementById('lightbulb').src = '../static/images/lightOn.png';
             document.getElementById("emailText").innerText = data["emailBody"];
-        }
-        else {
-            document.getElementById('lightbulb').src='../static/images/lightOff.png';
+        } else {
+            document.getElementById('lightbulb').src = '../static/images/lightOff.png';
             document.getElementById("emailText").innerText = "";
         }
         console.log(data);
     });
 }
 
-function getUserData(){
+function getUserData() {
     fetch('/get_user')
     .then(response => response.json())
     .then(data => {
-        // if(data["isUserLoggedIn"]){
-        //     document.getElementById("loggedIn").innerText = "A new user has logged in";
-        // }
-        if(!data["isUserLoggedIn"]){
-            document.getElementById("loggedIn").innerText = "Login failed";
-        }else{
-            document.getElementById("loggedIn").innerText = "";
+        if (!data["isUserLoggedIn"]) {
+            document.getElementById("loggedIn").innerText = "Please scan your card to login";
+            document.getElementById("profileId").innerText = "Profile ID: Unknown";
+        } else {
+            document.getElementById("loggedIn").innerText = "Logged in";
+            document.getElementById("profileId").innerText = "Profile ID: " + data["userID"];
         }
-        document.getElementById("profileId").innerText = "Profile ID: " + data["userID"];
         document.getElementById("rfidTag").innerText = "RFID tag ID: " + data["userRFID"];
         document.getElementById("lightLevel").innerText = "Minimum Light Level: " + data["userLightThresh"];
         document.getElementById("tempLevel").innerText = "Maximum Temperature: " + data["userTempThresh"] + " C";
         console.log(data);
     });
+}
 
+
+function onRFIDTagDetected(rfidTag) {
+    // If RFID is 'none' or null, don't log out or change the user, just keep the current user logged in
+    if (rfidTag === 'none' || rfidTag === null) {
+        return;  
+    }
+
+    if (rfidTag !== currentRFID) {
+        currentRFID = rfidTag;
+        fetch('/login_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ rfid: rfidTag }),
+        })
+        .then(response => response.json())
+        .then(data => {
+           
+            getUserData();  
+        });
+    }
 }
