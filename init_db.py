@@ -16,16 +16,22 @@ CREATE TABLE IF NOT EXISTS UserProfiles (
 
 # Add users with RFID tags
 users = [
-    ('user1', '33a2130e'),
-    ('user2', '1358daf7'),
-    ('user3', '737a980e')
+    ('user1', '33a2130e', '21', '800'),
+    ('user2', '1358daf7', '22', '600'),
+    ('user3', '737a980e', '21', '1000'),
+    ('Chris2', '0332d124', '24', '200')
 ]
 
-for userID, rfidTag in users:
+for user in users:
+
+    userID, rfidTag = user[0], user[1]
+    tempThreshold = user[2] if len(user) > 2 else 25
+    lightThreshold = user[3] if len(user) > 3 else 400
+
     cursor.execute('''
-    INSERT OR IGNORE INTO UserProfiles (userID, rfidTag)
-    VALUES (?, ?)
-    ''', (userID, rfidTag))
+    INSERT OR IGNORE INTO UserProfiles (userID, rfidTag, tempThreshold, lightThreshold)
+    VALUES (?, ?, ?, ?)
+    ''', (userID, rfidTag, tempThreshold, lightThreshold))
 
 # Commit changes and close
 conn.commit()
